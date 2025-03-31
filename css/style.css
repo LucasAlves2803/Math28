@@ -1,0 +1,418 @@
+body {
+    /* display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: flex-start;  */
+    height: 100vh; 
+    background-color: #f2f2f2;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+}
+.container {
+    background-color: #ffffff;
+    padding: 0;
+    border-radius: 0px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    max-width: 800px;
+ /* // a combinação width e max-width faz com que a tela 
+    // tenha sempre 90% da largura desde que 90% da largura seja menor que 600px, caso seja maior
+    // o container terá largura de 600px e esse valor será fixo  */
+    height: 10%;
+
+}
+.input-group {
+    display: flex;
+    flex-wrap: nowrap; /* calc(100% - 100px); */
+    width: 100%;
+   /* // o flex-wrap força os item a ficarem sempre na mesma linha não importa a dimensão da tela */
+
+}
+.input-group div {
+    border: 2px solid #ced4da;
+    border-radius: 15px 0 0 15px;
+    /* // arredonda as bordas separadamente, a primeira dimensão altera a borda superior esquerda, a segunda a superior direita, ou seja,             //segue o sentido horário, tendo primeira borda a superior esquerda */ 
+    padding: 0.75rem 1rem;
+    /* rem é o tamanho default (padrão) e desde que não tenha sido alterado é 16px, ou seja,
+1rem = 16px isso significa que o padding (espaço interno em relação a borda) é de 12px em cima e embaixo e de 16px na direita e na esquerda */
+    font-size: 16px;
+    width: calc(100% - 100px);
+    /* width: calc(100% - 100px) faz com que o elemento tenha 100% da largura do elemento pai porém subtraído menos 100px */ 
+    height: 52px; /* a altura especificada é de 52px porém a altura real é de 80px porque isso é a soma do padding (12 + 12) mais a borda (2 + 2) mais a altura (52) daí é 12 + 12 + 2 + 2 + 52 = 80  */
+    transition: border-color 0.3s ease-in-out;
+    /* o transition cria um efeito agradável no atributo escolhido, no caso atual é o border-color, mas poderia ser outro ao clicar no input; a cor da borda surge suavemente */
+    min-height: 50px; /* Aumenta o espaço clicável */
+    font-size: 24px;  /* Aumenta o tamanho do texto */
+    border: 1px solid #ccc;
+    /* padding: 10px; */
+    /* border-radius: 5px; */
+    cursor: text;
+}
+.input-group div:focus {
+    border-color: #ff0000;
+    box-shadow: 0 0 0 0.25rem rgba(255, 0, 0, 0.25);
+    outline: none; 
+} 
+.input-group button {
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0 15px 15px 0;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100px;
+    transition: background-color 0.3s ease-in-out, transform 0.05s ease-in-out; 
+  
+}
+.input-group button:active {
+    transform: scale(0.9);
+} 
+.input-group button:hover {
+    background-color: #cc0000;
+}
+
+
+
+
+
+
+#latex-output {
+    background-color: #e9ecef;
+    border-radius: .25rem;
+    padding: .375rem .75rem;
+    font-size: 1.25rem;
+    white-space: pre-wrap;
+}
+
+
+header{
+    /* border:1px solid black; */
+    text-align: center;
+    color: white;
+    background-color: #90ee90;
+    width: 5vw;
+    border-radius: 4px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);   
+}
+
+ /* Adicionando estilo para o contêiner do teclado
+ #keyboard-container {
+    margin-top: 20px;
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+  } */
+
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&family=Great+Vibes&display=swap');
+
+
+#root{
+    display: flex;
+    border-left: 3px solid red;
+    border-right: 3px solid red;
+    /* background-color: green; */
+    height: 100%;
+    width: 100%;
+    /* border:10px solid black; */
+    justify-content: center;
+    align-items: center;
+}
+    
+/* Estilo da raiz */
+.root-container {
+    max-width: 800px;
+    width: 70vw;
+    margin: 0 auto;
+    max-height: 70%;
+    height: 80vh;
+    padding: 20px;
+    position: relative;
+    border-left: 3px solid #ff6666; /* Vermelho mais claro */
+    border-right: 3px solid #ff6666;
+    border-radius: 10px;
+    background-color: #fcfcfc; /* Branco um pouco mais escuro */
+    overflow-y: auto; /* colocar overflow-y permite as divs crescer sem sair visualmente da div pai, criar uma barra de rolagem a div filha fique muito grande */
+}
+
+.input-expression.sticky {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem; /* Aumenta o tamanho da expressão */
+    /* position: -webkit-sticky; Compatibilidade com navegadores antigos */
+    position: relative; /* position relative centraliza o elemento no topo da caixinha de solução passo a passo */
+    top: 0;
+    background-color: #fcfcfc;
+    /* background-color: #90ee90; */
+    z-index: 11;
+    padding: 10px 0;
+    /* border-bottom: 2px solid #ccc; */
+}
+
+.dashed-line {
+    border: none;
+    border-top: 2px dashed #ccc;
+    margin: 20px 0;
+}
+
+.solution-steps {  /* essa div agrupa todas as etapas de resolução da expressão*/
+    /* margin-top: 1px; */
+    position: relative;
+    overflow-y: scroll;
+}
+
+.step {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-left: 3px solid #ff0000;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+}
+
+.expression-step {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.operation-title {
+    background-color: #e0e0e0;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.operation span {
+    font-weight: bold;
+    color: #333;
+}
+
+.operation-detail {
+    display: none;
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border-left: 3px solid #ff6666;
+}
+
+.final-result {
+    margin-top: 30px;
+    font-weight: bold;
+    border-left: 3px solid #ff0000;
+    border-right: 3px solid #ff0000;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    position: absolute;
+    /* left: 20px; */
+    /* width: 10%; */
+    font-size: 1.4rem;
+    text-align: center;
+    padding: 2px;
+    color: #000; /* Cor preta para o resultado final */
+    /* top:50%; */
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+/* design da tela de mensagem de erro */
+.result-container {
+    max-width: 600px;
+    padding: 20px;
+    background: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+
+  .result-container img {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 20px;
+  }
+
+  .result-container .main-message {
+    font-size: 18px;
+    font-weight: bold;
+    color: #202124;
+    margin-bottom: 10px;
+  }
+
+  .result-container .sub-message {
+    font-size: 14px;
+    color: #5f6368;
+    line-height: 1.6;
+  }
+
+  /* design do novo estilo, dos novos botões */
+  
+  
+  /* :root {
+    --selection-mode-color: #1668c7;
+  } */
+  .dark {
+    background-color: black;
+    color: white;
+  }
+
+  html {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none; /* supported by Chrome and Opera */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  input {
+    font-size: 1rem;
+    width: 2.5rem;
+  }
+
+  #typesetEditModeLatex {
+    border: 1px solid gray;
+    padding: 0.25rem;
+    min-height: 2.5rem;
+  }
+  #viewModeLatex {
+    text-align: right;
+  }
+
+  #mathKeyboard > * {
+    display: inline-block;
+    border: 1px solid gray;
+    padding: 0.25rem;
+    margin: 1px;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    vertical-align: middle;
+    text-align: center;
+    cursor: default;
+    user-select: none;
+    outline: 0;
+  }
+
+  .inSelectionMode {
+    background-color: var(--selection-mode-color);
+  }
+  #selectionModeToggle {
+    background-color: var(--selection-mode-color);
+  }
+
+  #settingsContainer {
+    display: none;
+    text-align: left;
+  }
+
+  .setting {
+    margin: 1rem;
+    cursor: default;
+  }
+  .setting-value {
+    border: 1px solid gray;
+    padding: 0.15rem;
+  }
+
+  .footer {
+    text-align: center;
+    color: #58a6ff;
+    margin: 15px;
+  }
+
+  .footer > a {
+    display: inline-block;
+    color: #58a6ff;
+    margin: 4px;
+    text-decoration: none;
+    border: 1px solid #58a6ff;
+    padding: 0.25rem;
+  }
+
+  #inputMirror {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: green;
+  }
+
+  #inputToParse {
+    width: 300px;
+  }
+
+  kbd {
+    border: 2px solid gray;
+    font-size: 1rem;
+    padding: 2px;
+  }
+
+  /* estilo novo adicionado */
+  /* .symbols-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 10px;
+} */
+
+#expressao{
+  border: 1px solid gray; 
+  font-size: 34px;
+  width: 20px;
+  height: 34px;
+  /* color: black; se a cor não for definida explicitamente, ela mudará de acordo com a cor do body */ 
+}
+
+.symbol {
+color: black;
+width: 40px; /* Aumente a largura para melhor alinhamento */
+height: 20px; /* Altura consistente */
+display: flex;
+align-items: center;
+justify-content: center;
+/* border: 5px solid red; */
+border-radius: 5px; 
+background-color: white;
+font-size: 1.2rem;
+cursor: pointer;
+}
+
+.symbols-container {
+display: flex;
+flex-wrap: wrap;
+justify-content: center;
+margin-top: 10px;
+gap: 10px; /* Espaço entre os elementos */
+}
+
+
+
+
+
+.symbol:hover {
+background-color : 'red';
+color: 'white';
+transform : scale(1.2);
+transition : all 0.534s ease;
+}
+
+.symbol:active{
+background-color: red; /* Cor de fundo ao passar o mouse */
+color: white;          /* Texto branco ao passar o mouse */
+transform: scale(1.6); /* Pequeno zoom */
+transition: all 0.2s ease; /* Suaviza a animação */
+}

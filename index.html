@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Meu Primeiro Arquivo de Programação Nesse Computador</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+    <!-- <title>Math Input Example</title> -->
+    
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.4/math.js"></script> -->
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.css"> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathquill/0.10.1/mathquill.min.js"></script> -->
+    <!-- <script type="text/javascript" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>  -->
+     <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> -->
+     <!-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/mathkeyboardengine@v1.1.1/dist/MathKeyboardEngine.es2015-iife.min.js"></script>
+     MathJax specific code START -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script> -->
+     <!-- Nova importação de bibliotecas -->
+      
+    <!-- Importação das bibliotecas MathJax e math.js -->
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.1/math.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    
+
+    <script src="js/latex-to-js.js"></script>
+    <!-- MathJax specific code END -->
+     <script type="module">
+    
+      console.log(typeof math.parse); // Deve imprimir "function"
+
+      import * as mke from 'https://cdn.jsdelivr.net/npm/mathkeyboardengine@v1.1.0/dist/MathKeyboardEngine.es2017-esm.min.js';
+      let latexConfiguration = new mke.LatexConfiguration();
+      let keyboardMemory = new mke.KeyboardMemory();
+      const supportsSelectionMode = 'supportsSelectionMode';
+      const darkSelectionModeColor = '#1668c7';
+      const lightSelectionModeColor = '#add8e6';
+
+       const buttonEnter = document.getElementById("ParseExpression");
+      buttonEnter.addEventListener("click", new_display);
+
+      const colorScheme = document.getElementById('colorScheme');
+      const bodyClassList = document.body.classList;
+
+      
+      // Forçar o tema claro no início
+      bodyClassList.remove('dark');  
+      colorScheme.innerText = 'light';
+      setSelectionModeColor(lightSelectionModeColor);
+
+      document.getElementById('colorSchemeToggle').onclick = () => {
+        if (colorScheme.innerText == 'light') {
+          bodyClassList.add('dark');
+          colorScheme.innerText = 'dark';
+          // setSelectionModeColor(darkSelectionModeColor);
+        } else {
+          bodyClassList.remove('dark');
+          colorScheme.innerText = 'light';
+          setSelectionModeColor(lightSelectionModeColor);
+        }
+        displayResult();
+      };
+
+      function setSelectionModeColor(color) {
+        document.body.style.setProperty('--selection-mode-color', color);
+        setSelectionHightlightStart(color);
+      }
+
+      displayResult();
+
+    //   coloca os botões dos números
+      for (let i = 0; i < 10; i++) {
+        registerNodeKey('digit' + i, () => new mke.DigitNode(i.toString()));
+      }
+
+      const decimalSeparatorTypeElement = document.getElementById('decimalSeparatorType');
+      document.getElementById('decimalSeparatorToggle').onclick = () => {
+        const key = document.getElementById('decimalSeparator');
+        if (decimalSeparatorTypeElement.innerText == 'decimal comma') {
+          decimalSeparatorTypeElement.innerText = 'decimal point';
+          typesetLatexInKey('.', key);
+        } else {
+          decimalSeparatorTypeElement.innerText = 'decimal comma';
+          typesetLatexInKey('{,}', key);
+        }
+        displayResult();
+      };
+      const getDecimalSeparatorPreference = () => (decimalSeparatorTypeElement.innerText == 'decimal comma' ? '{,}' : '.');
+      const getDecimalSeparatorNode = () => new mke.DecimalSeparatorNode(getDecimalSeparatorPreference);
+      registerNodeKey('decimalSeparator', getDecimalSeparatorNode);
+      registerNodeKey('plus', () => new mke.StandardLeafNode('+'));
+      registerNodeKey('minus', () => new mke.StandardLeafNode('-'));
+      registerNodeKey('div', () => new mke.StandardLeafNode('÷'));
+      const multiplicationSignTypeElement = document.getElementById('multiplicationSignType');
+      document.getElementById('multiplicationSignToggle').onclick = () => {
+        multiplicationSignTypeElement.innerText = multiplicationSignTypeElement.innerText == 'cross' ? 'dot' : 'cross';
+        displayResult();
+      };
+      const getMultiplicationNode = () => new mke.StandardLeafNode(() => (multiplicationSignTypeElement.innerText == 'cross' ? String.raw`\times` : String.raw`\cdot`));
+      registerNodeKey('multiply', getMultiplicationNode);
+      registerNodeKey('ratio', () => new mke.StandardLeafNode(':'));
+      // registerNodeKey('faculty', () => new mke.StandardLeafNode('!'));
+      const getFractionNode = () => new mke.DescendingBranchingNode(String.raw`\frac{`, '}{', '}');
+      registerNodeKey('fraction', getFractionNode, mke.insert, mke.insertWithEncapsulateSelection);
+      const getBinomialNode = () => new mke.DescendingBranchingNode(String.raw`\binom{`, '}{', '}');
+      registerNodeKey('binomial', getBinomialNode, mke.insert, mke.insertWithEncapsulateSelection);
+      const getPowerNode = () => new mke.AscendingBranchingNode('', '^{', '}');
+      registerNodeKey('power', getPowerNode, mke.insertWithEncapsulateCurrent, mke.insertWithEncapsulateSelectionAndPrevious);
+      // const getSubscriptNode = () => new mke.DescendingBranchingNode('', '_{', '}');
+      // registerNodeKey('subscript', getSubscriptNode, mke.insertWithEncapsulateCurrent, mke.insertWithEncapsulateSelectionAndPrevious);
+      const getSquareRootNode = () => new mke.StandardBranchingNode(String.raw`\sqrt{`, '}');
+      registerNodeKey('squareRoot', getSquareRootNode, mke.insert, mke.insertWithEncapsulateSelection);
+      registerNodeKey('nthRoot', () => new mke.DescendingBranchingNode(String.raw`\sqrt[`, ']{', '}'));
+      registerNodeKey('roundBrackets', () => new mke.RoundBracketsNode(), mke.insert, mke.insertWithEncapsulateSelection);
+      const getSquareBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left[`, String.raw`\right]`);
+      registerNodeKey('squareBrackets', getSquareBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
+      // const getPipesNode = () => new mke.StandardBranchingNode(String.raw`\left|`, String.raw`\right|`);
+      // registerNodeKey('pipes', getPipesNode, mke.insert, mke.insertWithEncapsulateSelection);
+      // registerNodeKey('doublePipes', () => new mke.StandardBranchingNode(String.raw`\left\|`, String.raw`\right\|`), mke.insert, mke.insertWithEncapsulateSelection);
+      const getCurlyBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left\{`, String.raw`\right\}`);
+      registerNodeKey('curlyBrackets', getCurlyBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
+      registerNodeKey('tan', () => new mke.StandardLeafNode(String.raw`\tan{}`));
+      registerNodeKey('arcsin', () => new mke.StandardLeafNode(String.raw`\arcsin{}`));
+      registerNodeKey('sin', () => new mke.StandardLeafNode(String.raw`\sin{}`));
+      registerNodeKey('cos', () => new mke.StandardLeafNode(String.raw`\cos^{}`));
+      registerNodeKey('cos-1', () => new mke.StandardLeafNode(String.raw`\cos^{-1}`));
+      registerNodeKey('taninv', () => new mke.StandardLeafNode(String.raw`\tan^{inv}`));
+      registerKey('selectionModeToggle', (k) => {
+        if (mke.inSelectionMode(k)) {
+          myLeaveSelectionMode(k);
+        } else {
+          myEnterSelectionMode(k);
+        }
+      });
+
+      registerKey('moveLeft', mke.moveLeft, mke.selectLeft, false);
+      typesetLatexInKey(String.raw`\leftarrow`, document.getElementById('moveLeft'));
+      registerKey('moveRight', mke.moveRight, mke.selectRight, false);
+      typesetLatexInKey(String.raw`\rightarrow`, document.getElementById('moveRight'));
+      registerKey('moveUp', mke.moveUp);
+      typesetLatexInKey('\\uparrow', document.getElementById('moveUp'));
+      registerKey('moveDown', mke.moveDown);
+      typesetLatexInKey(String.raw`\downarrow`, document.getElementById('moveDown'));
+      registerKey('deleteLeft', mke.deleteLeft, mke.deleteSelection);
+
+      function myLeaveSelectionMode(k) {
+        mke.leaveSelectionMode(k);
+        let elements = document.getElementsByClassName(supportsSelectionMode);
+        for (let element of elements) {
+          element.classList.remove('inSelectionMode');
+        }
+      }
+      function myEnterSelectionMode(k) {
+        mke.enterSelectionMode(k);
+        let elements = document.getElementsByClassName(supportsSelectionMode);
+        for (let element of elements) {
+          element.classList.add('inSelectionMode');
+        }
+      }
+
+      function registerNodeKey(elementId, nodeGetter, onclickFuncForKeyboardMemoryAndNode = mke.insert, onclickSelectionModeArrowFuncForKeyboardMemoryAndNode = null) {
+        let element = document.getElementById(elementId);
+        if (onclickSelectionModeArrowFuncForKeyboardMemoryAndNode != null) {
+          element.classList.add(supportsSelectionMode);
+        }
+
+        let latex = mke.getViewModeLatex(nodeGetter(), latexConfiguration);
+        console.log(latex); // Depure para ver o que está sendo inserido
+
+        typesetLatexInKey(latex, element);
+        element.onclick = () => {
+          if (mke.inSelectionMode(keyboardMemory)) {
+            if (onclickSelectionModeArrowFuncForKeyboardMemoryAndNode != null) {
+              onclickSelectionModeArrowFuncForKeyboardMemoryAndNode(keyboardMemory, nodeGetter());
+            } else {
+              onclickFuncForKeyboardMemoryAndNode(keyboardMemory, nodeGetter());
+            }
+            myLeaveSelectionMode(keyboardMemory);
+          } else {
+            onclickFuncForKeyboardMemoryAndNode(keyboardMemory, nodeGetter());
+          }
+          displayResult();
+        };
+      }
+
+      function registerKey(elementId, onclickArrowFuncForKeyboardMemory, onclickSelectionModeFuncForKeyboardMemory = null, shouldLeaveSelectionMode = true) {
+        let element = document.getElementById(elementId);
+        if (onclickSelectionModeFuncForKeyboardMemory != null) {
+          element.classList.add(supportsSelectionMode);
+        }
+
+        element.onclick = () => {
+          if (mke.inSelectionMode(keyboardMemory)) {
+            if (onclickSelectionModeFuncForKeyboardMemory != null) {
+              onclickSelectionModeFuncForKeyboardMemory(keyboardMemory);
+            }
+            if (shouldLeaveSelectionMode) {
+              myLeaveSelectionMode(keyboardMemory);
+            }
+          } else {
+            onclickArrowFuncForKeyboardMemory(keyboardMemory);
+          }
+          displayResult();
+        };
+      }
+
+      function displayResult() {
+        if (keyboardMemory.current instanceof mke.Placeholder && keyboardMemory.current.nodes.length == 0) {
+          latexConfiguration.activePlaceholderShape = String.raw`\blacksquare`;
+        } else {
+          latexConfiguration.activePlaceholderShape = '|';
+        }
+        let editModeLatex = mke.getEditModeLatex(keyboardMemory, latexConfiguration);
+        typesetLatexInOutputBox(editModeLatex, document.getElementById('typesetEditModeLatex')); // chama a função que renderiza o latex de forma bonita
+        let expressao = mke.getEditModeLatex(keyboardMemory, latexConfiguration);
+        // console.log(Object.keys(latexConfiguration)); // Lista todos os métodos e propriedades do objeto
+        // console.log(Object.keys(keyboardMemory)); // Lista todos os métodos e propriedades do objeto
+        let viewModeLatex = mke.getViewModeLatex(keyboardMemory, latexConfiguration);
+        // console.log(latex_to_js(expressao));
+        document.getElementById('viewModeLatex').innerText = viewModeLatex;
+        console.log("elementos digitados: "+ viewModeLatex);
+        console.log("Expressão digitada " + latex_to_js(expressao));
+      }
+
+      // === MathJax specific code START ===
+      function typesetLatexInKey(latex, element) {
+        element.innerText = String.raw`\(` + latex + String.raw`\)`;
+        // MathJax.Hub.Typeset(element);
+        MathJax.typesetPromise([element]);
+        element.classList.add('symbol'); // Adicione a classe .symbol para manter o estilo consistente
+        // element.style = `color: red; 
+        //                  width: 10px; 
+        //                  height: 10px; 
+        //                  display: flex; 
+        //                  align-items: center;
+        //                  justify-content: center;
+        //                  border: 2px solid red;
+        //                  border-radius: 5px;
+        //                  background-color: white;
+        //                  font-size: 1.2rem;
+        //                  cursor: pointer;
+        // `
+    }
+      function typesetLatexInOutputBox(latex, element) {
+        element.innerText = String.raw`\(\displaystyle ` + latex + String.raw`\)`;
+        // MathJax.Hub.Typeset(element);
+        MathJax.typesetPromise([element]);
+      }
+
+      function setSelectionHightlightStart(color) {
+        latexConfiguration.selectionHightlightStart = String.raw`\bbox[` + color + ']{';
+      }
+      latexConfiguration.selectionHightlightEnd = '}';
+      // === MathJax specific code END ===
+
+      // === Handle key presses of a physical keyboard START ===
+      let inShift = false;
+      document.onkeyup = (e) => {
+        const key = e.code;
+        if (key.startsWith('Shift')) {
+          inShift = false;
+        }
+      };
+
+      function createHandler(matchingPredicateForKey, handleForKeyboardMemoryAndKey) {
+        return { canHandle: matchingPredicateForKey, handle: handleForKeyboardMemoryAndKey };
+      }
+
+      const physicalKeydownHandlersForShift = [
+        createHandler((key) => key == 'Digit6', (k, key) => mke.insertWithEncapsulateCurrent(k, getPowerNode())),
+        createHandler((key) => key == 'Digit9', (k, key) => mke.insert(k, new mke.RoundBracketsNode())),
+        createHandler((key) => key == 'Digit0', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'Digit8', (k, key) => mke.insert(k, getMultiplicationNode())),
+        createHandler((key) => key == 'Equal', (k, key) => mke.insert(k, new mke.StandardLeafNode('+'))),
+        createHandler((key) => key == 'Minus', (k, key) => mke.insertWithEncapsulateCurrent(k, getSubscriptNode())),
+        createHandler((key) => key == 'Digit1', (k, key) => mke.insert(k, new mke.StandardLeafNode('!'))),
+        createHandler((key) => key == 'Digit5', (k, key) => mke.insert(k, new mke.StandardLeafNode(String.raw`\%`))),
+        createHandler((key) => key.startsWith('Key'), (k, key) => mke.insert(k, new mke.StandardLeafNode(key[3]))),
+        createHandler((key) => key == 'ArrowLeft', (k, key) => { myEnterSelectionMode(k); mke.selectLeft(k); }),
+        createHandler((key) => key == 'ArrowRight', (k, key) => { myEnterSelectionMode(k); mke.selectRight(k); }),
+        createHandler((key) => key == 'Backslash', (k, key) => mke.insert(k, getPipesNode())),
+        createHandler((key) => key == 'BracketLeft', (k, key) => mke.insert(k, getCurlyBracketsNode())),
+        createHandler((key) => key == 'BracketRight', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'Comma', (k, key) => mke.insert(k, new mke.StandardLeafNode('<'))),
+        createHandler((key) => key == 'Period', (k, key) => mke.insert(k, new mke.StandardLeafNode('>'))),
+        createHandler((key) => key == 'Semicolon', (k, key) => mke.insert(k, new mke.StandardLeafNode(':'))),
+      ];
+
+      const selectionModePhysicalKeydownHandlersForShift = [
+        createHandler((key) => key == 'Digit6', (k, key) => mke.insertWithEncapsulateSelectionAndPrevious(k, getPowerNode())),
+        createHandler((key) => key == 'BracketLeft', (k, key) => mke.insertWithEncapsulateSelection(k, getCurlyBracketsNode())),
+        createHandler((key) => key == 'Backslash', (k, key) => mke.insertWithEncapsulateSelection(k, getPipesNode())),
+        createHandler((key) => key == 'Digit9', (k, key) => mke.insertWithEncapsulateSelection(k, new mke.RoundBracketsNode())),
+      ];
+
+      const selectionModePhysicalKeydownHandlersNoShift = [
+        createHandler((key) => key == 'Backspace', (k, key) => mke.deleteSelection(k)),
+        createHandler((key) => key == 'Delete', (k, key) => mke.deleteSelection(k)),
+        createHandler((key) => key == 'BracketLeft', (k, key) => mke.insertWithEncapsulateSelection(k, getSquareBracketsNode())),
+        createHandler((key) => key == 'Slash', (k, key) => mke.insertWithEncapsulateSelection(k, getFractionNode())),
+      ];
+
+      const physicalKeydownHandlersNoShift = [
+        createHandler((key) => key.startsWith('Digit'), (k, key) => mke.insert(k, new mke.DigitNode(key[5]))),
+        createHandler((key) => key.startsWith('Key'), (k, key) => mke.insert(k, new mke.StandardLeafNode(key[3].toLocaleLowerCase()))),
+        createHandler((key) => key == 'Backspace', (k, key) => mke.deleteLeft(k)),
+        createHandler((key) => key == 'ArrowLeft', (k, key) => mke.moveLeft(k)),
+        createHandler((key) => key == 'ArrowRight', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'ArrowUp', (k, key) => mke.moveUp(k)),
+        createHandler((key) => key == 'ArrowDown', (k, key) => mke.moveDown(k)),
+        createHandler((key) => key == 'Slash', (k, key) => mke.insertWithEncapsulateCurrent(k, getFractionNode(), { deleteOuterRoundBracketsIfAny: true })),
+        createHandler((key) => key == 'Equal', (k, key) => mke.insert(k, new mke.StandardLeafNode('='))),
+        createHandler((key) => key == 'Minus', (k, key) => mke.insert(k, new mke.StandardLeafNode('-'))),
+        createHandler((key) => key == 'Period' || key == 'Comma', (k, key) => mke.insert(k, getDecimalSeparatorNode())),
+        createHandler((key) => key == 'BracketLeft', (k, key) => mke.insert(k, getSquareBracketsNode())),
+        createHandler((key) => key == 'BracketRight', (k, key) => mke.moveRight(k)),
+        createHandler((key) => key == 'IntlRo', (k, key) => mke.insert(k, new mke.StandardLeafNode('÷'))), // comando para fazer o simbolo da divisão funcionar usando as teclas do teclado
+        createHandler((key) => key == 'Enter', (k, key) => new_display()),
+        createHandler((key) => key == 'Delete', (k, key) => mke.deleteRight(k)),
+      ];
+
+   function renderLatex(expression, elementId) {
+        let element = document.getElementById(elementId);
+        element.innerText = `\\(${expression}\\)`;
+        // MathJax.Hub.Queue(["Typeset", MathJax.Hub, element]);
+    }
+
+// Exemplo de uso
+// renderLatex("3+5\\times\\sqrt{4}", "outputBox");
+
+      function new_display(){
+        let viewModeLatex = mke.getViewModeLatex(keyboardMemory, latexConfiguration);
+        let expressao = document.querySelector('#expressao');
+        console.log("Colocando uma nova expressão " + expressao);
+        console.log("Expressão no formato latex " + latex_to_js(viewModeLatex)) // não sei se estou colocando no formato latex ou tirando
+        expressao.innerHTML = `\\( ${viewModeLatex} \\)`;
+        try {
+           // renderLatex(viewModeLatex, "expressao");
+            //  let result = ` \(${math.parse(latex_to_js(viewModeLatex)).toText()}\) `;
+            //  console.log("Resultado:", result);
+            // Converte a expressão para LaTeX usando math.js
+            // let latexExpression = math.parse(inputExpression).toTex();
+                
+                // Exibe a saída formatada
+                // let outputDiv = document.getElementById("latexOutput");
+                // outputDiv.innerHTML = `\\(${latexExpression}\\)`;
+
+                // Renderiza com MathJax
+                // MathJax.typesetPromise([expressao]);
+
+        } catch (error) {
+        console.error("Erro ao interpretar a expressão:", error);
+        }
+
+        let resultado = analyzeExpression(latex_to_js(viewModeLatex));
+        console.log(resultado);
+        const novos_dados = JSON.parse(resultado);
+        console.log(novos_dados);
+        console.log(novos_dados[1]);
+        // console.log(novos_dados[1]);
+        // novos_dados é o array que terá passo a passo a resolução da expressão numérica ou terá a mensagem de erro
+        // pra saber qual é qual basta acessar novos_dados[0]['tipo_de_ordem] se for o valor for 'Normal' ela armazena o passo a passo da resolução
+        // se for 'Anormal' tem a mensagem de erro 
+        const root = document.getElementById("root"); // root é o elemento pai, onde todos os outros elementos html estarão inseridos
+        // todos no sentido de elementos html da explicação da resolução
+        // ou os elem. html da mensagem de erro
+            
+        if (novos_dados[0]['tipo_de_ordem'] == 'Anormal'){ // aqui está o elemento html da mensagem de erro
+            // a mensagem de erro é colocada diretamente no root por meio do innerHTML
+                // um detalhe importante é que caso fosse root.innerHTML += '' a mensagem de erro seriam concatenadas 
+                // ou a mensagem de erro apareceria no final abaixo ou do lado dos elem. de resolução passo a passo, o que está errado
+                // por isso usei NÃO SE DEVE USAR O +=
+                // usa só o = porque assim tudo o que estava antes é apagado, sobrescrito, escrito por cima, desfazendo o anterior
+                root.innerHTML += `  <div class="result-container">
+                            <img src="img/Ryo_sem_fundo.png" alt="Lupa">
+                            <div id="texto">
+                            <div class="main-message">A expressão tá escrita errada</div>
+                            <div class="sub-message">
+                            ${novos_dados[1]['erro']} <br> // é novos_dados[1]['erro'] porque as mensagens de erro estão no segundo elemento do array, ou seja, no índice 1
+                            </div>
+                        </div>`;
+                   
+        }else{
+                CriaDesign_da_solucao_passo_a_passo(novos_dados,root)}
+        }
+        
+        // MathJax.Hub.Typeset(element);
+        // Fazendo a requisição POST para o backend
+        // fetch('/api/latex-expression/analyze', {
+        // method: 'POST',
+        // headers: {
+        //     'Content-Type': 'application/json',
+        // },
+        // body: JSON.stringify({ valor: latex_to_js(viewModeLatex) }),
+        // })
+        // .then(response => response.json())
+        // .then( async data => { 
+        //     // console.log(data); // Manipule os dados aqui
+        //     const novos_dados = JSON.parse(data); // converti para ser manipulado como um objeto
+        //     console.log(novos_dados[1]);
+        //     // console.log(novos_dados[1]);
+        //     // novos_dados é o array que terá passo a passo a resolução da expressão numérica ou terá a mensagem de erro
+        //     // pra saber qual é qual basta acessar novos_dados[0]['tipo_de_ordem] se for o valor for 'Normal' ela armazena o passo a passo da resolução
+        //     // se for 'Anormal' tem a mensagem de erro 
+        //     const root = document.getElementById("root"); // root é o elemento pai, onde todos os outros elementos html estarão inseridos
+        //     // todos no sentido de elementos html da explicação da resolução
+        //     // ou os elem. html da mensagem de erro
+            
+        //     if (novos_dados[0]['tipo_de_ordem'] == 'Anormal'){ // aqui está o elemento html da mensagem de erro
+        //         // a mensagem de erro é colocada diretamente no root por meio do innerHTML
+        //         // um detalhe importante é que caso fosse root.innerHTML += '' a mensagem de erro seriam concatenadas 
+        //         // ou a mensagem de erro apareceria no final abaixo ou do lado dos elem. de resolução passo a passo, o que está errado
+        //         // por isso usei NÃO SE DEVE USAR O +=
+        //         // usa só o = porque assim tudo o que estava antes é apagado, sobrescrito, escrito por cima, desfazendo o anterior
+        //         root.innerHTML += `  <div class="result-container">
+        //                     <img src="img/Ryo_sem_fundo.png" alt="Lupa">
+        //                     <div id="texto">
+        //                     <div class="main-message">A expressão tá escrita errada</div>
+        //                     <div class="sub-message">
+        //                     ${novos_dados[1]['erro']} <br> // é novos_dados[1]['erro'] porque as mensagens de erro estão no segundo elemento do array, ou seja, no índice 1
+        //                     </div>
+        //                 </div>`;
+                   
+        //     }else{
+        //         CriaDesign_da_solucao_passo_a_passo(novos_dados,root)}
+        //     }
+        // )
+        // .catch((error) => {
+        // console.error('Error:', error);
+        // });
+      
+
+      document.onkeydown = (e) => {
+        if (document.activeElement.classList.contains('disable-physical-keypress-math-input-when-focused')) {
+          return;
+        }
+        const shouldPreventDefault = true;
+        const key = e.code;
+        console.log(key);
+        if (key.startsWith('Shift')) {
+          inShift = true;
+        } else if (mke.inSelectionMode(keyboardMemory)) {
+          if (key == 'ArrowLeft') {
+            mke.selectLeft(keyboardMemory);
+          } else if (key == 'ArrowRight') {
+            mke.selectRight(keyboardMemory);
+          } else if (inShift) {
+            let handler = selectionModePhysicalKeydownHandlersForShift.find((handler) => handler.canHandle(key));
+            if (handler != null) {
+              handler.handle(keyboardMemory, key);
+              myLeaveSelectionMode(keyboardMemory);
+            } else {
+              myLeaveSelectionMode(keyboardMemory, key);
+              physicalKeydownHandlersForShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
+            }
+          } else {
+            let handler = selectionModePhysicalKeydownHandlersNoShift.find((handler) => handler.canHandle(key));
+            if (handler != null) {
+              handler.handle(keyboardMemory, key);
+              myLeaveSelectionMode(keyboardMemory);
+            } else {
+              myLeaveSelectionMode(keyboardMemory);
+              physicalKeydownHandlersNoShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
+            }
+          }
+        } else {
+          if (!inShift && key == 'Backslash') {
+            inputToParse.focus();
+            shouldPreventDefault = false;
+          } else if (inShift) {
+            physicalKeydownHandlersForShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
+          } else {
+            console.log("Aqui aparecerá apenas os dígitos " + key);
+            // console.log(key === 'IntlRo');
+            physicalKeydownHandlersNoShift.find((handler) => handler.canHandle(key))?.handle(keyboardMemory, key);
+          }
+        }
+        displayResult();
+        if (shouldPreventDefault) {
+          e.preventDefault(/* Prevent triggering a browser hot key. */);
+        }
+      };
+      // === Handle key presses of a physical keyboard END ===
+
+      // === Experimental feature: parsing a LaTeX string START ===
+      var inputToParse = document.getElementById('inputToParse');
+      var inputMirror = document.getElementById('inputMirror');
+      var parseButton = document.getElementById('parseButton');
+      inputToParse.oninput = 
+      inputToParse.onpaste =
+      () => {
+        const value = inputToParse.value;
+        inputMirror.innerText = value.length > 2 ? inputToParse.value + ' ----> press Enter' : value;
+      }
+
+      function inputButton(){
+        const value = inputToParse.value; // pega a string digitada
+        if (value.trim() === ''){
+            return;
+        }
+        const nodes = mke.parseLatex(value, parserConfig).syntaxTreeRoot.nodes;
+        mke.insert(keyboardMemory, nodes);
+        displayResult();
+        inputToParse.value = '';
+        inputMirror.innerText = '';
+        document.activeElement.blur();
+        window.scrollTo(0, 0);
+      }
+    
+      var parserConfig = new mke.LatexParserConfiguration();
+      parserConfig.preferRoundBracketsNode = true;
+      parserConfig.preferredDecimalSeparator = getDecimalSeparatorPreference;
+      inputToParse.onkeydown = (e) => {
+        if (e.code == 'Enter') {
+         inputButton();
+        }
+      };
+
+      parseButton.onclick = inputButton;
+      // === Experimental feature: parsing a LaTeX string END ===
+    </script>
+ <!-- <script type="text/javascript">
+  window.addEventListener('DOMContentLoaded', (event) => {
+    let latexConfiguration = new mke.LatexConfiguration();
+    let keyboardMemory = new mke.KeyboardMemory();
+
+    // Subscribe to onclick events of virtual key presses, etc.
+  });
+</script>  -->
+ 
+</head>
+<body class="dark">
+    <div id="inputMirror"></div>
+    <div id="typesetEditModeLatex" ></div>
+    <div id="viewModeLatex"></div>
+    <button id="ParseExpression"> Resolver </button>
+    <div id="mathKeyboard">
+      <div id="selectionModeToggle" class="symbols-container"></div>
+      <div id="moveUp">&#x25B2;</div>
+      <div id="deleteLeft">&#128293;</div>
+      <br />
+      <div id="moveLeft">&#x25C0;</div>
+      <div id="moveDown">&#x25BC;</div>
+      <div id="moveRight">&#x25B6;</div>
+      <div id="digit0"></div>
+      <div id="digit1"></div>
+      <div id="digit2"></div>
+      <div id="digit3"></div>
+      <div id="digit4"></div>
+      <div id="digit5"></div>
+      <div id="digit6"></div>
+      <div id="digit7"></div>
+      <div id="digit8"></div>
+      <div id="digit9"></div>
+     
+      <div id="decimalSeparator" class="symbol"></div>
+      <div id="plus" class="symbol"></div>
+      <div id="minus" class="symbol"></div>
+      <div id="multiply" class="symbol"></div>
+      <div id="ratio" class="symbol"></div>
+      <div id="div" class="symbol"></div>
+      <div id="binomial" class="symbol"></div>
+      <div id="fraction" class="symbol"></div>
+      <div id="power" class="symbol"></div>
+      <div id="squareRoot" class="symbol"></div>
+      <div id="nthRoot" class="symbol"></div>
+      <div id="roundBrackets" class="symbol"></div>
+      <div id="squareBrackets" class="symbol"></div>
+      <div id="curlyBrackets" class="symbol"></div>
+      <div id="sin" class="symbol"></div>
+      <div id="cos" class="symbol"></div>
+      <div id="tan" class="symbol"></div>
+      <div id="arcsin" class="symbol"></div>
+      <div id="cos-1" class="symbol"></div>
+      <div id="taninv" class="symbol"></div>
+      <div onclick="const settingsContainer = document.getElementById('settingsContainer'); settingsContainer.style.display = settingsContainer.style.display == 'block' ? 'none' : 'block';">
+        <strong>Settings</strong>
+      </div>
+      <div id="settingsContainer">
+        <div id="multiplicationSignToggle" class="setting">Output multiplication sign: <span class="setting-value" id="multiplicationSignType">cross</span></div>
+        <div id="decimalSeparatorToggle" class="setting">Decimal separator: <span class="setting-value" id="decimalSeparatorType">decimal point</span></div>
+        <div id="colorSchemeToggle" class="setting">Color scheme: <span class="setting-value" id="colorScheme"></span></div>
+      </div>
+      
+    </div>
+    <input id="inputToParse" type="text" placeholder="Type or paste + press Enter" class="disable-physical-keypress-math-input-when-focused" />
+    <button id="parseButton">Parse</button>
+
+    <div id="expressao"></div>
+
+    <!-- <div class="container">
+        <div class="input-group">
+            <div type="text" id="math" class="form-control"  placeholder="Enter your equation..."></div>
+            <button class="btn" id="get-latex" onclick="animateContainer()">Submit</button>
+        </div>
+    </div>  -->
+
+  <!-- Div para o teclado -->
+  <!-- <div id="keyboard-container"></div> -->
+   
+    </div>
+    <div id="root">
+        <!-- <div class="result-container">
+            <img src="img/Ryo_sem_fundo.png" alt="Lupa">
+            <div id="texto">
+                <div class="main-message">A expressão tá escrita errada</div>
+                
+                <div class="sub-message">
+                //(espaço para a mensagem específica) Verifique se todas as palavras estão corretas. <br>
+                Tente usar palavras-chave diferentes. <br>
+                Tente usar menos palavras-chave.
+                </div>
+            </div> -->
+            
+        </div>
+    </div>
+    2+2^3
+    \(\textcolor{red}{2+2} + 2^3 \)
+    <!-- <p id="latex-output"></p>  -->
+    <!-- <div class="root-container"> 
+        
+        <div class="input-expression sticky">
+            <span id="expression"><strong>2x^2 + 3x - 5 = 0</strong></span>
+        </div>
+        
+        <hr class="dashed-line">
+    
+        <div class="solution-steps"> 
+            <div class="step">
+                <div class="expression-step">
+                    <strong>2x^2 + 3x = 5</strong>
+                </div>
+                <div class="operation">
+                    <span>Isolando o termo constante</span>
+                    <div class="operation-detail">
+                        <p>Aqui nós movemos o -5 para o outro lado da equação.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="expression-step">
+                    <strong>2x^2 + 3x = 5</strong>
+                </div>
+                <div class="operation">
+                    <span>Isolando o termo constante</span>
+                    <div class="operation-detail">
+                        <p>Aqui nós movemos o -5 para o outro lado da equação.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="expression-step">
+                    <strong>2x^2 + 3x = 5</strong>
+                </div>
+                <div class="operation">
+                    <span>Isolando o termo constante</span>
+                    <div class="operation-detail">
+                        <p>Aqui nós movemos o -5 para o outro lado da equação.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="expression-step">
+                    <strong>2x^2 + 3x = 5</strong>
+                </div>
+                <div class="operation">
+                    <span>Isolando o termo constante</span>
+                    <div class="operation-detail">
+                        <p>Aqui nós movemos o -5 para o outro lado da equação.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="expression-step">
+                    <strong>2x^2 + 3x = 5</strong>
+                </div>
+                <div class="operation">
+                    <span>Isolando o termo constante</span>
+                    <div class="operation-detail">
+                        <p>Aqui nós movemos o -5 para o outro lado da equação.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="expression-step">
+                    <strong>2x^2 + 3x = 5</strong>
+                </div>
+                <div class="operation">
+                    <span>Isolando o termo constante</span>
+                    <div class="operation-detail">
+                        <p>Aqui nós movemos o -5 para o outro lado da equação.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="expression-step">
+                    <strong>2x^2 + 3x = 5</strong>
+                </div>
+                <div class="operation">
+                    <span>Isolando o termo constante</span>
+                    <div class="operation-detail">
+                        <p>Aqui nós movemos o -5 para o outro lado da equação.</p>
+                    </div>
+                </div>
+            </div>
+        </div>    
+        <hr class="dashed-line">
+        
+        <div class="final-result">
+            <span>Resultado Final: <strong>x = 1, x = -2.5</strong></span>
+        </div>
+    </div> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script> -->
+    <script>
+        function animateContainer() {
+            const container = document.querySelector('.container');
+            container.style.transform = 'scale(1.05)';
+	    setTimeout(() => {
+                container.style.transform = 'scale(1)';
+            }, 400);
+        }
+    </script>
+    <script src="js/script.js"></script>    
+    <script src='js/Mathquill.js'></script>
+    <script src="js/expressionService.js"></script>
+    <!-- <script src="C:\Users\Mrsir\OneDrive\Documentos\my-node-project\src\script_atualizado.js"></script> -->
+</body>
+</html>
