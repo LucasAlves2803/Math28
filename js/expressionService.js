@@ -38,6 +38,15 @@ const mensagens = {
     '*-': { titulo:"Primeiro a Multiplicação" ,
         descricao: 'Faça primeiro a multiplicação, porque ela tem maior procedência que a subtração, se você não entendeu porque isso clique aqui, após multiplicar, faça as somas e printo'
     },
+    '/-':{
+        titulo: "Primeiro a Divisão",
+        descricao: "Faça primeiro a divisão, porque ela tem maior procedência que a subtração, se você não entendeu porque isso clique aqui, após dividir, faça as subtrações e pronto."
+    },
+    '/+':{
+        titulo: "Primeiro a Divisão",
+        descricao: "Faça primeiro a divisão, porque ela tem maior procedência que a soma, se você não entendeu porque isso clique aqui, após dividir, faça a soma e pronto"
+    }
+    ,
     '-+': {
         titulo: "Soma e Subtraia na ordem em que aparecer",
         descricao: "A soma e subtração tem a mesma prioridade, nesse caso, resolve a que aparecer primeiro"
