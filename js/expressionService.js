@@ -45,8 +45,39 @@ const mensagens = {
     '/+':{
         titulo: "Primeiro a Divisão",
         descricao: "Faça primeiro a divisão, porque ela tem maior procedência que a soma, se você não entendeu porque isso clique aqui, após dividir, faça a soma e pronto"
-    }
-    ,
+    },
+    "*/+":{
+        titulo: 'Primeiro a multiplicação, em seguida a divisão, depois a soma',
+        descricao:"Faça primeiro a multiplicação, depois a divisão, porque essas operações tem maior prioridade, depois faça a soma"
+    },
+    "*/-":{
+        titulo: 'Primeiro a multiplicação, em seguida a divisão, depois a subtração',
+        descricao: "Faça primeiro a multiplicação, depois a divisão, porque essas operações tem maior prioridade, depois faça a subtração"
+    },
+    "/*+":{
+        titulo: 'Primeiro a divisão, em seguida a multiplicação, depois a soma',
+        descricao: "Faça primeiro a divisão, depois a multiplicação, porque essas operações tem maior prioridade, depois faça a soma"
+    },
+    "/*-":{
+        titulo: 'Primeiro a divisão, em seguida a multiplicação, depois a subtração',
+        descricao: "Faça primeiro a divisão, depois a multiplicação, porque essas operações tem maior prioridade, depois faça a soma"
+    },
+    '/*-+':{
+        titulo: 'Primeiro a divisão, em seguida a multiplicação, depois subtração e soma',
+        descricao:"Faça primeiro a divisão, em seguida a multiplicação, porque essas operações tem maior prioridade, depois faça a subtração ou a soma, tanto faz qual delas fazer primeiro"
+    },
+    '/*+-':{
+        titulo: 'Primeiro a divisão, em seguida a multiplicação, depois a soma e subtração',
+        descricao:"Faça primeiro a divisão, em seguida a multiplicação, porque essas operações tem maior prioridade, depois faça a soma ou a subtração, tanto faz qual delas fazer primeiro"
+    },
+    '*/+-':{
+        titulo: 'Primeiro a multiplicação, em seguida a divisãp, depois a soma e subtração',
+        descricao:"Faça primeiro a multiplicação, em seguida a divisão, porque essas operações tem maior prioridade, depois faça a soma ou a subtração, tanto faz qual delas fazer primeiro"
+    },
+    '*/-+':{
+        titulo: 'Primeiro a multiplicação, em seguida a divisãp, depois a soma e subtração',
+        descricao:"Faça primeiro a divisão, em seguida a multiplicação, porque essas operações tem maior prioridade, depois faça a soma ou a subtração, tanto faz qual delas fazer primeiro"
+    },
     '-+': {
         titulo: "Soma e Subtraia na ordem em que aparecer",
         descricao: "A soma e subtração tem a mesma prioridade, nesse caso, resolve a que aparecer primeiro"
@@ -517,6 +548,7 @@ function construirArvoreExpressaoPosFixada(arrayPosFixado) {
         if (ehOperando(token.simbolo)) {
             let novoNode = new Node(token.simbolo, token.prior_simbol);
             if (!simbol_conc.includes(token.simbolo)){ // concatena os operadores
+                // sendo que ele concatena só os símbolos que ainda não foram concatenados, ou seja, simbolos repetidos não entra
                 simbol_conc += token.simbolo;
             }
             // if (pilha.length === 0){
