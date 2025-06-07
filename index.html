@@ -107,31 +107,32 @@
       registerNodeKey('multiply', getMultiplicationNode);
       registerNodeKey('ratio', () => new mke.StandardLeafNode(':'));
       // registerNodeKey('faculty', () => new mke.StandardLeafNode('!'));
-      const getFractionNode = () => new mke.DescendingBranchingNode(String.raw`\frac{`, '}{', '}');
-      registerNodeKey('fraction', getFractionNode, mke.insert, mke.insertWithEncapsulateSelection);
-      const getBinomialNode = () => new mke.DescendingBranchingNode(String.raw`\binom{`, '}{', '}');
-      registerNodeKey('binomial', getBinomialNode, mke.insert, mke.insertWithEncapsulateSelection);
-      const getPowerNode = () => new mke.AscendingBranchingNode('', '^{', '}');
-      registerNodeKey('power', getPowerNode, mke.insertWithEncapsulateCurrent, mke.insertWithEncapsulateSelectionAndPrevious);
+      // const getFractionNode = () => new mke.DescendingBranchingNode(String.raw`\frac{`, '}{', '}');
+      // como apaguei os botões também apaguei as funções que imprimem essas funções no formato latex na tela
+      // registerNodeKey('fraction', getFractionNode, mke.insert, mke.insertWithEncapsulateSelection);
+      // const getBinomialNode = () => new mke.DescendingBranchingNode(String.raw`\binom{`, '}{', '}');
+      // registerNodeKey('binomial', getBinomialNode, mke.insert, mke.insertWithEncapsulateSelection);
+      // const getPowerNode = () => new mke.AscendingBranchingNode('', '^{', '}');
+      // registerNodeKey('power', getPowerNode, mke.insertWithEncapsulateCurrent, mke.insertWithEncapsulateSelectionAndPrevious);
       // const getSubscriptNode = () => new mke.DescendingBranchingNode('', '_{', '}');
       // registerNodeKey('subscript', getSubscriptNode, mke.insertWithEncapsulateCurrent, mke.insertWithEncapsulateSelectionAndPrevious);
-      const getSquareRootNode = () => new mke.StandardBranchingNode(String.raw`\sqrt{`, '}');
-      registerNodeKey('squareRoot', getSquareRootNode, mke.insert, mke.insertWithEncapsulateSelection);
-      registerNodeKey('nthRoot', () => new mke.DescendingBranchingNode(String.raw`\sqrt[`, ']{', '}'));
+      // const getSquareRootNode = () => new mke.StandardBranchingNode(String.raw`\sqrt{`, '}');
+      // registerNodeKey('squareRoot', getSquareRootNode, mke.insert, mke.insertWithEncapsulateSelection);
+      // registerNodeKey('nthRoot', () => new mke.DescendingBranchingNode(String.raw`\sqrt[`, ']{', '}'));
       registerNodeKey('roundBrackets', () => new mke.RoundBracketsNode(), mke.insert, mke.insertWithEncapsulateSelection);
-      const getSquareBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left[`, String.raw`\right]`);
-      registerNodeKey('squareBrackets', getSquareBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
+      // const getSquareBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left[`, String.raw`\right]`);
+      // registerNodeKey('squareBrackets', getSquareBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
       // const getPipesNode = () => new mke.StandardBranchingNode(String.raw`\left|`, String.raw`\right|`);
       // registerNodeKey('pipes', getPipesNode, mke.insert, mke.insertWithEncapsulateSelection);
       // registerNodeKey('doublePipes', () => new mke.StandardBranchingNode(String.raw`\left\|`, String.raw`\right\|`), mke.insert, mke.insertWithEncapsulateSelection);
-      const getCurlyBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left\{`, String.raw`\right\}`);
-      registerNodeKey('curlyBrackets', getCurlyBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
-      registerNodeKey('tan', () => new mke.StandardLeafNode(String.raw`\tan{}`));
-      registerNodeKey('arcsin', () => new mke.StandardLeafNode(String.raw`\arcsin{}`));
-      registerNodeKey('sin', () => new mke.StandardLeafNode(String.raw`\sin{}`));
-      registerNodeKey('cos', () => new mke.StandardLeafNode(String.raw`\cos^{}`));
-      registerNodeKey('cos-1', () => new mke.StandardLeafNode(String.raw`\cos^{-1}`));
-      registerNodeKey('taninv', () => new mke.StandardLeafNode(String.raw`\tan^{inv}`));
+      // const getCurlyBracketsNode = () => new mke.StandardBranchingNode(String.raw`\left\{`, String.raw`\right\}`);
+      // registerNodeKey('curlyBrackets', getCurlyBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
+      // registerNodeKey('tan', () => new mke.StandardLeafNode(String.raw`\tan{}`));
+      // registerNodeKey('arcsin', () => new mke.StandardLeafNode(String.raw`\arcsin{}`));
+      // registerNodeKey('sin', () => new mke.StandardLeafNode(String.raw`\sin{}`));
+      // registerNodeKey('cos', () => new mke.StandardLeafNode(String.raw`\cos^{}`));
+      // registerNodeKey('cos-1', () => new mke.StandardLeafNode(String.raw`\cos^{-1}`));
+      // registerNodeKey('taninv', () => new mke.StandardLeafNode(String.raw`\tan^{inv}`));
       registerKey('selectionModeToggle', (k) => {
         if (mke.inSelectionMode(k)) {
           myLeaveSelectionMode(k);
@@ -542,7 +543,7 @@
     <div id="viewModeLatex"></div>
     <button id="ParseExpression"> Resolver </button>
     <div id="mathKeyboard">
-      <!-- <div id="selectionModeToggle" class="symbols-container"></div> -->
+      <div id="selectionModeToggle" class="symbols-container"></div>
       <div id="moveUp">&#x25B2;</div>
       <div id="deleteLeft">&#128293;</div>
       <br />
@@ -566,20 +567,20 @@
       <div id="multiply" class="symbol"></div>
       <div id="ratio" class="symbol"></div>
       <div id="div" class="symbol"></div>
-      <!-- <div id="binomial" class="symbol"></div>   -->
+      <!-- <div id="binomial" class="symbol"></div> -->
       <!-- <div id="fraction" class="symbol"></div> -->
-      <div id="power" class="symbol"></div> 
+      <!-- <div id="power" class="symbol"></div> -->
       <!-- <div id="squareRoot" class="symbol"></div> -->
-      <!-- <div id="nthRoot" class="symbol"></div> -->
-      <div id="roundBrackets" class="symbol"></div  >
-      <!-- <div id="squareBrackets" class="symbol"></div> -->
-      <!-- <div id="curlyBrackets" class="symbol"></div> -->
-      <!-- <div id="sin" class="symbol"></div> -->
-      <!-- <div id="cos" class="symbol"></div> -->
-      <!-- <div id="tan" class="symbol"></div> -->
-      <!-- <div id="arcsin" class="symbol"></div> -->
-      <!-- <div id="cos-1" class="symbol"></div> -->
-      <!-- <div id="taninv" class="symbol"></div> -->
+      <div id="nthRoot" class="symbol"></div>
+      <div id="roundBrackets" class="symbol"></div>
+      <div id="squareBrackets" class="symbol"></div>
+      <div id="curlyBrackets" class="symbol"></div>
+      <div id="sin" class="symbol"></div>
+      <div id="cos" class="symbol"></div>
+      <div id="tan" class="symbol"></div>
+      <div id="arcsin" class="symbol"></div>
+      <div id="cos-1" class="symbol"></div>
+      <div id="taninv" class="symbol"></div>
       <div onclick="const settingsContainer = document.getElementById('settingsContainer'); settingsContainer.style.display = settingsContainer.style.display == 'block' ? 'none' : 'block';">
         <strong>Settings</strong>
       </div>
