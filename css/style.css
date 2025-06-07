@@ -285,23 +285,32 @@ header{
   }
 
   #typesetEditModeLatex {
-    border: 1px solid gray;
+    border: 1px solid red;
+    border-radius: 4px;
+    background-color: white ;
     padding: 0.25rem;
     min-height: 2.5rem;
+    height: 10px;
+    width: 600px;
   }
   #viewModeLatex {
     text-align: right;
   }
 
-  #mathKeyboard > * {
-    display: inline-block;
-    border: 1px solid gray;
+  #mathKeyboard   {
+    display: grid;
+    /* border: 1px solid red; */
+    border: 1px solid red;
+    border-radius: 4px;
+    background-color: white;
     padding: 0.25rem;
     margin: 1px;
     min-width: 1.5rem;
     min-height: 1.5rem;
-    vertical-align: middle;
-    text-align: center;
+    /* vertical-align: middle; */
+    /* text-align: center; */
+    grid-template-columns: repeat(4 ,50px);  
+    grid-template-rows:  repeat(7 ,35px );
     cursor: default;
     user-select: none;
     outline: 0;
