@@ -121,7 +121,7 @@ const mensagens = {
      
 }
 
-
+// novo comentário para testar o push e pull do projeto mathProject sem backend
 var operador = '';
 var retorno_da_requisicao = []; // o retorno da requisição será um array de dicionário
 const subexpressao_json = {}; // json que armazena todas as informações de uma subexpressão. título, descrição, passos
