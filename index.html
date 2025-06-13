@@ -341,7 +341,7 @@
         let expressao = document.querySelector('#expressao');
         console.log("Colocando uma nova expressão " + expressao);
         console.log("Expressão no formato latex " + latex_to_js(viewModeLatex)) // não sei se estou colocando no formato latex ou tirando
-        expressao.innerHTML = `\\( ${viewModeLatex} \\)`;
+        //expressao.innerHTML = `\\( ${viewModeLatex} \\)`;
         try {
            // renderLatex(viewModeLatex, "expressao");
             //  let result = ` \(${math.parse(latex_to_js(viewModeLatex)).toText()}\) `;
@@ -539,7 +539,8 @@
 </head>
 <body class="dark">
     <div id="inputMirror"></div>
-    <div id="typesetEditModeLatex" ></div>
+
+    <div id="typesetEditModeLatex"></div>
     <div id="viewModeLatex"></div>
     <button id="ParseExpression"> Resolver </button>
     <div id="mathKeyboard">

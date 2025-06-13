@@ -116,8 +116,8 @@ header{
 
 #root{
     display: flex;
-    border-left: 3px solid red;
-    border-right: 3px solid red;
+    /* border-left: 3px solid red;
+    border-right: 3px solid red; */
     /* background-color: green; */
     height: 100%;
     width: 100%;
@@ -135,6 +135,7 @@ header{
     height: 80vh;
     padding: 20px;
     position: relative;
+    top: 15%;
     border-left: 3px solid #ff6666; /* Vermelho mais claro */
     border-right: 3px solid #ff6666;
     border-radius: 10px;
@@ -287,17 +288,49 @@ header{
   #typesetEditModeLatex {
     border: 1px solid red;
     border-radius: 4px;
+    position: absolute;
+    left:50%;
+    transform: translate(-50%);
     background-color: white ;
     padding: 0.25rem;
     min-height: 2.5rem;
-    height: 10px;
+    /* height: 30px; */
     width: 600px;
   }
+  #ParseExpression{
+    height: 50px;
+    width:70px;
+    position: absolute;
+    left:67.25%;
+    /* transform: translate(0,10px); */
+    top:0.3px;
+    color:white;
+    background-color: red;
+    cursor: pointer; 
+
+  }
+
+  #ParseExpression:hover{
+    transform : scale(1.2);
+  transition : all 0.534s ease;
+  }
+  #ParseExpression:active{
+    background-color: white; /* Cor de fundo ao passar o mouse */
+    color: red;          /* Texto branco ao passar o mouse */
+    transform: scale(1.6); /* Pequeno zoom */
+    transition: all 0.2s ease; /* Suaviza a animação */
+}
+
   #viewModeLatex {
     text-align: right;
   }
 
   #mathKeyboard   {
+
+    position: absolute;
+    top: 6%;
+    left:50%;
+    transform: translate(-50%);
     display: grid;
     /* border: 1px solid red; */
     border: 1px solid red;
