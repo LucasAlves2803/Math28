@@ -762,8 +762,35 @@ function inverte_Elementos(contL){ // conferir se esse algoritmo funciona para t
     }
 }
 
+function Eh_envolvida_por_paretenses( number){
+    let contador_abre = 0;
+    let tem_parenteses = false;
+    for (i=0; i < number.length - 1; i++){
+        if (number[i] == '('){
+            contador_abre++;
+            tem_parenteses = true;
+        }else if (number[i] == ')'){
+            contador_abre--;
+            tem_parenteses = true;
+        }
+    }
+    if(contador_abre >0)
+        number+')'.repeat(contador_abre);
+    else if (contador_abre <0)
+        '('.repeat(contador_abre) + number;
+    else {
+        if (tem_parenteses){
+             console.log("A expressao " + number + "não está envolvida por nenhum parenteses");
+        }else{
+            console.log("A expressao " + number + "já está envolvida por parenteses");
+        }
+       
+    }
+}
+
 const analyzeExpression  = (expressao) =>{
     console.log("expressão entrada " + expressao);
+    Eh_envolvida_por_paretenses(expressao);
     follow = 0; // o follow tem que ser zerado toda vez que uma nova expressão é chamada, a declaração do follow no escopo global (fora das funções) só é carregada quando o código é carregado no início (quando o servidor é ligado), por isso 
     // quando uma nova expressão do front end é recebida o valor do follow é o que foi armazenado por último na execução anterior e isso causa um efeito colateral na expressão atual 
     // por isso zero o follow aqui
