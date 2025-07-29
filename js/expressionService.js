@@ -764,28 +764,29 @@ function inverte_Elementos(contL){ // conferir se esse algoritmo funciona para t
 
 function Eh_envolvida_por_paretenses( number){
     let contador_abre = 0;
-    let tem_parenteses = false;
+    let tem_parenteses = true;
     for (i=0; i < number.length - 1; i++){
         if (number[i] == '('){
             contador_abre++;
-            tem_parenteses = true;
         }else if (number[i] == ')'){
             contador_abre--;
-            tem_parenteses = true;
+        }else if (tem_parenteses){
+            if (contador_abre == 0){
+                log = false;
+            }
         }
     }
-    if(contador_abre >0)
-        number+')'.repeat(contador_abre);
-    else if (contador_abre <0)
-        '('.repeat(contador_abre) + number;
-    else {
-        if (tem_parenteses){
-             console.log("A expressao " + number + "não está envolvida por nenhum parenteses");
-        }else{
-            console.log("A expressao " + number + "já está envolvida por parenteses");
+    if (!tem_parenteses){
+        if(contador_abre >0)
+           number =  number+')'.repeat(contador_abre);
+        else if (contador_abre <0)
+            number = '('.repeat(contador_abre) + number;
+        else {
+            number = '(' + number + ')';
         }
-       
     }
+        
+    
 }
 
 const analyzeExpression  = (expressao) =>{
