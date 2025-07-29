@@ -327,7 +327,7 @@ header{
 
   #mathKeyboard   {
 
-    position: absolute;
+   position: absolute;
     top: 6%;
     left:50%;
     transform: translate(-50%);
@@ -342,12 +342,13 @@ header{
     min-height: 1.5rem;
     /* vertical-align: middle; */
     /* text-align: center; */
-    grid-template-columns: repeat(4 ,50px);  
+    grid-template-columns: repeat(4 ,70px);  
     grid-template-rows:  repeat(7 ,35px );
     cursor: default;
     user-select: none;
     outline: 0;
   }
+
 
   .inSelectionMode {
     background-color: var(--selection-mode-color);
