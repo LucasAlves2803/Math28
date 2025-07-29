@@ -772,7 +772,7 @@ function Eh_envolvida_por_paretenses( number){
             contador_abre--;
         }else if (tem_parenteses){
             if (contador_abre == 0){
-                log = false;
+                tem_parenteses = false;
             }
         }
     }
