@@ -785,6 +785,8 @@ function Eh_envolvida_por_paretenses( number){
             number = '(' + number + ')';
         }
     }
+
+    return number;
         
     
 }
