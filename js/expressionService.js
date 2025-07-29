@@ -785,15 +785,12 @@ function Eh_envolvida_por_paretenses( number){
             number = '(' + number + ')';
         }
     }
-
     return number;
-        
-    
 }
 
 const analyzeExpression  = (expressao) =>{
     console.log("expressão entrada " + expressao);
-    Eh_envolvida_por_paretenses(expressao);
+    expressao = Eh_envolvida_por_paretenses(expressao);
     follow = 0; // o follow tem que ser zerado toda vez que uma nova expressão é chamada, a declaração do follow no escopo global (fora das funções) só é carregada quando o código é carregado no início (quando o servidor é ligado), por isso 
     // quando uma nova expressão do front end é recebida o valor do follow é o que foi armazenado por último na execução anterior e isso causa um efeito colateral na expressão atual 
     // por isso zero o follow aqui
