@@ -43,7 +43,20 @@
       const darkSelectionModeColor = '#1668c7';
       const lightSelectionModeColor = '#add8e6';
 
-       const buttonEnter = document.getElementById("ParseExpression");
+      const latex_input_placeholder = document.getElementById('typesetEditModeLatex');
+
+      
+  
+      latex_input_placeholder.addEventListener('click', function() {
+        // O input perdeu o foco
+        displayResult();
+      });
+
+      
+        
+      
+
+      const buttonEnter = document.getElementById("ParseExpression");
       buttonEnter.addEventListener("click", new_display);
 
       const colorScheme = document.getElementById('colorScheme');
@@ -68,12 +81,15 @@
         displayResult();
       };
 
+
+
       function setSelectionModeColor(color) {
         document.body.style.setProperty('--selection-mode-color', color);
         setSelectionHightlightStart(color);
       }
 
-      displayResult();
+      
+
 
     //   coloca os botões dos números
       for (let i = 0; i < 10; i++) {
@@ -150,6 +166,7 @@
       registerKey('moveDown', mke.moveDown);
       typesetLatexInKey(String.raw`\downarrow`, document.getElementById('moveDown'));
       registerKey('deleteLeft', mke.deleteLeft, mke.deleteSelection);
+      
 
       function myLeaveSelectionMode(k) {
         mke.leaveSelectionMode(k);
@@ -158,6 +175,7 @@
           element.classList.remove('inSelectionMode');
         }
       }
+      
       function myEnterSelectionMode(k) {
         mke.enterSelectionMode(k);
         let elements = document.getElementsByClassName(supportsSelectionMode);
@@ -214,7 +232,7 @@
 
       function displayResult() {
         if (keyboardMemory.current instanceof mke.Placeholder && keyboardMemory.current.nodes.length == 0) {
-          latexConfiguration.activePlaceholderShape = String.raw`\blacksquare`;
+          latexConfiguration.activePlaceholderShape = String.raw`\square`;
         } else {
           latexConfiguration.activePlaceholderShape = '|';
         }
@@ -226,9 +244,12 @@
         let viewModeLatex = mke.getViewModeLatex(keyboardMemory, latexConfiguration);
         // console.log(latex_to_js(expressao));
         document.getElementById('viewModeLatex').innerText = viewModeLatex;
+        console.log("Impressão teste " + mke.getViewModeLatex(keyboardMemory,latexConfiguration))
         console.log("elementos digitados: "+ viewModeLatex);
         console.log("Expressão digitada " + latex_to_js(expressao));
       }
+
+      
 
       // === MathJax specific code START ===
       function typesetLatexInKey(latex, element) {
@@ -507,6 +528,7 @@
             return;
         }
         const nodes = mke.parseLatex(value, parserConfig).syntaxTreeRoot.nodes;
+        console.log("O que o 'nodes' " + nodes);
         mke.insert(keyboardMemory, nodes);
         displayResult();
         inputToParse.value = '';
@@ -540,14 +562,16 @@
 <body class="dark">
     <div id="inputMirror"></div>
 
-    <div id="typesetEditModeLatex"></div>
+    <div id="typesetEditModeLatex">
+      <h5>Digite uma expressão númerica</h5>
+    </div>
     <div id="viewModeLatex"></div>
     <button id="ParseExpression"> Resolver </button>
     <div id="mathKeyboard">
       <div id="selectionModeToggle" class="symbols-container"></div>
       <div id="moveUp">&#x25B2;</div>
       <div id="deleteLeft">&#128293;</div>
-      <br />
+      <div id="apagatudo" onclick="apaga_tudo()"> Borracha</div>
       <div id="moveLeft">&#x25C0;</div>
       <div id="moveDown">&#x25BC;</div>
       <div id="moveRight">&#x25B6;</div>
@@ -623,8 +647,6 @@
             
         </div>
     </div>
-    2+2^3
-    \(\textcolor{red}{2+2} + 2^3 \)
     <!-- <p id="latex-output"></p>  -->
     <!-- <div class="root-container"> 
         

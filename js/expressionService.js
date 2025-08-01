@@ -765,7 +765,7 @@ function inverte_Elementos(contL){ // conferir se esse algoritmo funciona para t
 function Eh_envolvida_por_paretenses( number){
     let contador_abre = 0;
     let tem_parenteses = true;
-    for (i=0; i < number.length - 1; i++){
+    for (i=0; i < number.length ; i++){
         if (number[i] == '('){
             contador_abre++;
         }else if (number[i] == ')'){
@@ -788,9 +788,16 @@ function Eh_envolvida_por_paretenses( number){
     return number;
 }
 
+function apaga_tudo(){
+    let elemento_latex = document.getElementsByTagId('mjx-container');
+    
+    console.log('teste de apagar tudo' + elemento_latex.inneHTML);
+}
+
 const analyzeExpression  = (expressao) =>{
     console.log("expressão entrada " + expressao);
     expressao = Eh_envolvida_por_paretenses(expressao);
+    console.log("expressão tratada " + expressao);
     follow = 0; // o follow tem que ser zerado toda vez que uma nova expressão é chamada, a declaração do follow no escopo global (fora das funções) só é carregada quando o código é carregado no início (quando o servidor é ligado), por isso 
     // quando uma nova expressão do front end é recebida o valor do follow é o que foi armazenado por último na execução anterior e isso causa um efeito colateral na expressão atual 
     // por isso zero o follow aqui
