@@ -788,7 +788,7 @@ function Eh_envolvida_por_paretenses( number){
     return number;
 }
 
-    
+
 
 const analyzeExpression  = (expressao) =>{
     console.log("expressão entrada " + expressao);
