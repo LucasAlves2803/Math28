@@ -788,11 +788,7 @@ function Eh_envolvida_por_paretenses( number){
     return number;
 }
 
-function apaga_tudo(){
-    let elemento_latex = document.getElementsByTagId('mjx-container');
     
-    console.log('teste de apagar tudo' + elemento_latex.inneHTML);
-}
 
 const analyzeExpression  = (expressao) =>{
     console.log("expressão entrada " + expressao);
