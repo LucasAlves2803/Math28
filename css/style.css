@@ -295,52 +295,86 @@ header{
   color: #ad8b8b;
 }
 
+#cabecalho{
+  position: absolute;
+  width: 100%;
+  height: 150px;
+  background-color:red;
+}
+
+#nome{
+  position:absolute;
+  top:3.4%;
+  left: 50%;
+  transform: translateY(50%);
+  color: white;
+  margin: 0;
+  padding: 0;
+  font-family:  Franklin Gothic;
+
+}
+
   #typesetEditModeLatex {
-    border: 1px solid red;
+    border: 1px solid white;
     border-radius: 4px;
     position: absolute;
-    left:50%;
-    transform: translate(-50%);
+    top: 13.5317%;
+    left: 50%;
+    transform: translateX(-50%);
+    /* left:50%; */
+    /* top:2%; */
+    /* transform: translate(-50%); */
     background-color: white ;
     padding: 0.25rem;
     min-height: 2.5rem;
     /* height: 30px; */
     width: 600px;
   }
+
   #ParseExpression{
     height: 50px;
     width:70px;
+    top: 13.5317%;  /* 13.53 % do altura da tela desce esse valor em pixel */
+    left: 50%; 
+    transform: translate(435%); /* 305px é metade do tamanho do input o botão resolver estava na metade dessa caixa
+    isso significa que tenho que andar mais 305px para ir até o final, uma forma de fazer isso é usar o translate daí fiz 
+    sendo 70px a largura do botão resolver, tenho que saber quantas vezes cabe 70 em 305, o que dá 4,35, daí só tenho 
+    que transladar 435% para andar 305px */
     position: absolute;
-    left:67.25%;
+    /* left:67.25%; */
+    border-top-right-radius: 10%;
+    border-bottom-right-radius: 10%;
+    border: 1px solid white;
     /* transform: translate(0,10px); */
-    top:0.3px;
+    /* top:0.3px; */
     color:white;
     background-color: red;
     cursor: pointer; 
     font-family:  Franklin Gothic;
 }
 
-  #ParseExpression:hover{
-    transform : scale(1.2);
+  /* #ParseExpression:hover{
+    transform : scale(1.0000001);
   transition : all 0.534s ease;
-  }
-  #ParseExpression:active{
-    background-color: white; /* Cor de fundo ao passar o mouse */
-    color: red;          /* Texto branco ao passar o mouse */
-    transform: scale(1.6); /* Pequeno zoom */
-    transition: all 0.2s ease; /* Suaviza a animação */
-}
+   } 
+  
+
+}  */
 
   #viewModeLatex {
     text-align: right;
   }
 
-  #mathKeyboard   {
+  #mathKeyboard{
 
-   position: absolute;
-    top: 6%;
-    left:50%;
-    transform: translate(-50%);
+    position: absolute;
+    /* top: 6%; */
+    /* left:50%; */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    /* left: 50%; */
+    /* transform: translate(-50%); */
     display: grid;
     /* border: 1px solid red; */
     border: 1px solid red;
