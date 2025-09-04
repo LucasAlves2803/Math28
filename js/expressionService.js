@@ -32,6 +32,9 @@ const mensagens = {
     '*/':{titulo: "Primeiro a Multiplicação" ,
         descricao: "Como a multiplicação aparece primeiro, resolve primeiro ela, em seguida com resultado dessa multiplicação, faça a divisão"
     },
+    '/*':{ titulo: 'Primeira a Divisão',
+            descricao: 'Faça primeiro a divisão depois a multiplicação'
+    },
     '*+': { titulo:"Primeiro a Multiplicação" ,
             descricao: 'Faça primeiro a multiplicação, porque ela tem maior procedência que a soma, se você não entendeu porque isso clique aqui, após multiplicar, faça as somas e printo'
         },
