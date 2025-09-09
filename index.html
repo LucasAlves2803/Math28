@@ -276,6 +276,10 @@
         MathJax.typesetPromise([element]);
       }
 
+      function isDigit(caracter) {
+        return /^\d$/.test(caracter);
+      ò}
+
       function setSelectionHightlightStart(color) {
         latexConfiguration.selectionHightlightStart = String.raw`\bbox[` + color + ']{';
       }
@@ -330,6 +334,7 @@
       ];
 
       const physicalKeydownHandlersNoShift = [
+        createHandler((key) => key.startsWith('Numpad') & isDigit(key[6]), (k,key) => mke.insert(k, new mke.DigitNode(key[6]))),
         createHandler((key) => key.startsWith('Digit'), (k, key) => mke.insert(k, new mke.DigitNode(key[5]))),
         createHandler((key) => key.startsWith('Key'), (k, key) => mke.insert(k, new mke.StandardLeafNode(key[3].toLocaleLowerCase()))),
         createHandler((key) => key == 'Backspace', (k, key) => mke.deleteLeft(k)),
@@ -338,6 +343,10 @@
         createHandler((key) => key == 'ArrowUp', (k, key) => mke.moveUp(k)),
         createHandler((key) => key == 'ArrowDown', (k, key) => mke.moveDown(k)),
         createHandler((key) => key == 'Slash', (k, key) => mke.insertWithEncapsulateCurrent(k, getFractionNode(), { deleteOuterRoundBracketsIfAny: true })),
+        createHandler((key) => key == 'NumpadAdd', (k, key) => mke.insert(k, new mke.StandardLeafNode('+'))),
+        createHandler((key) => key == 'NumpadSubtract', (k, key) => mke.insert(k, new mke.StandardLeafNode('-'))),
+        createHandler((key) => key == 'NumpadMultiply', (k, key) => mke.insert(k, new mke.StandardLeafNode('*'))),
+        createHandler((key) => key == 'NumpadDivide', (k, key) => mke.insert(k, new mke.StandardLeafNode('÷'))),
         createHandler((key) => key == 'Equal', (k, key) => mke.insert(k, new mke.StandardLeafNode('='))),
         createHandler((key) => key == 'Minus', (k, key) => mke.insert(k, new mke.StandardLeafNode('-'))),
         createHandler((key) => key == 'Period' || key == 'Comma', (k, key) => mke.insert(k, getDecimalSeparatorNode())),
@@ -345,6 +354,7 @@
         createHandler((key) => key == 'BracketRight', (k, key) => mke.moveRight(k)),
         createHandler((key) => key == 'IntlRo', (k, key) => mke.insert(k, new mke.StandardLeafNode('÷'))), // comando para fazer o simbolo da divisão funcionar usando as teclas do teclado
         createHandler((key) => key == 'Enter', (k, key) => new_display()),
+        createHandler((key) => key == 'NumpadEnter', (k, key) => new_display()),
         createHandler((key) => key == 'Delete', (k, key) => mke.deleteRight(k)),
       ];
 
