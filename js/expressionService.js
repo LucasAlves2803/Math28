@@ -16,6 +16,11 @@ let prioridades = {
 var follow = 0;
 array_mensagens = [];
 const mensagens = {
+
+    "^":{
+        titulo: "Pontenciação",
+        descricao:"Farei uma descrição melhor!"
+    },
     '+': { titulo: "Soma Simples",
            descricao: 'Apenas some, atenção para não errar conta de somar, senão aí volta pro jardim de infância'       
     },
@@ -120,6 +125,14 @@ const mensagens = {
     '^*-':{
         titulo: "Primeiro a potência, depois a multiplicação e por último a subtração",
         descricao: "Calcule primeiro a potência, porque ela tem maior ordem de procedência, depois faça a multiplicação, tenha atenção aos sinais, e por último faça a subtração"
+    },
+    'sqrt':{
+        titulo: 'Raiz quadrada',
+        descricao:"Ainda vou colocar uma mensagem"
+    },
+    'cos':{
+        titulo: 'Cosseno' ,
+        descricao: 'Ainda vou colocar uma mensagem melhor!!!!' 
     }
      
 }
@@ -567,10 +580,11 @@ function construirArvoreExpressaoPosFixada(arrayPosFixado) {
             // }
             pilha.push(novoNode);
         }else if(ehFuncao(token.nome)){
-            // console.log('funcao achada', token);
+            console.log('funcao achada', token, 'nome ', token.nome);
             novoNode = new Node(token.nome);
             novoNode.left = pilha.pop();
             pilha.push(novoNode);
+            simbol_conc += token.nome;
         } else {
             // console.log(token.value);
             if (token.letra == 'L'){ // conta quantos Ls tem na subárvore
@@ -794,6 +808,8 @@ function Eh_envolvida_por_paretenses( number){
 
 
 const analyzeExpression  = (expressao) =>{
+    const regex_power = /pow\(([+-]?\d+),([+-]?\d+)\)/
+    expressao = expressao.replace(regex_power,"$1^$2");
     console.log("expressão entrada " + expressao);
     expressao = Eh_envolvida_por_paretenses(expressao);
     console.log("expressão tratada " + expressao);
@@ -810,7 +826,7 @@ const analyzeExpression  = (expressao) =>{
         // se for uma expressão numérica significa que ela não tem nenhum erro
         // se for uma string de texto significa que a expressão numérica tem erros
         // Tenta avaliar a expressão
-        eval(expressao); // Verifica se o resultado é um número
+        math.evaluate(expressao); // Verifica se o resultado é um número
     } catch (error) { // se deu erro é porque a variável expressão na verdade é uma string de texto
         console.log("Erro : " + expressao);
         return JSON.stringify([{  // daí crio um array de json para retornar para o front end com duas chaves tipos_de_ordem que indican o tipo de expressão 'Normal' ou 'Anormal' e 'erro' que contem a mensagem que descreve o erro   

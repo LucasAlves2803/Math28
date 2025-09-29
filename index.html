@@ -145,8 +145,8 @@
       // registerNodeKey('curlyBrackets', getCurlyBracketsNode, mke.insert, mke.insertWithEncapsulateSelection);
       // registerNodeKey('tan', () => new mke.StandardLeafNode(String.raw`\tan{}`));
       // registerNodeKey('arcsin', () => new mke.StandardLeafNode(String.raw`\arcsin{}`));
-      // registerNodeKey('sin', () => new mke.StandardLeafNode(String.raw`\sin{}`));
-      // registerNodeKey('cos', () => new mke.StandardLeafNode(String.raw`\cos^{}`));
+      // registerNodeKey('sen', () => new mke.StandardLeafNode(String.raw`\sin{}`));
+      registerNodeKey('cos', () => new mke.StandardLeafNode(String.raw`\cos{}`));
       // registerNodeKey('cos-1', () => new mke.StandardLeafNode(String.raw`\cos^{-1}`));
       // registerNodeKey('taninv', () => new mke.StandardLeafNode(String.raw`\tan^{inv}`));
       registerKey('selectionModeToggle', (k) => {
@@ -613,11 +613,11 @@
       <div id="roundBrackets" class="symbol"></div>
       <!-- <div id="squareBrackets" class="symbol"></div> -->
       <!-- <div id="curlyBrackets" class="symbol"></div> -->
-      <!-- <div id="sin" class="symbol"></div> -->
-      <!-- <div id="cos" class="symbol"></div> -->
-      <!-- <div id="tan" class="symbol"></div> -->
+      <div id="sen" class="symbol"></div>
+      <div id="cos" class="symbol"></div>
+      <div id="tan" class="symbol"></div>
       <!-- <div id="arcsin" class="symbol"></div> -->
-      <!-- <div id="cos-1" class="symbol"></div> -->
+      <div id="cos-1" class="symbol"></div>
       <!-- <div id="taninv" class="symbol"></div> -->
       <div onclick="const settingsContainer = document.getElementById('settingsContainer'); settingsContainer.style.display = settingsContainer.style.display == 'block' ? 'none' : 'block';">
         <strong>Settings</strong>
