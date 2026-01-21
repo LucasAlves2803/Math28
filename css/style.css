@@ -296,20 +296,39 @@ header{
 }
 
 #cabecalho{
-  position: absolute;
+  position: relative;
   width: 100%;
   height: 150px;
   background-color:red;
 }
 
+#quadrado{
+  position: relative;
+  width: 100%;
+  height: 1px;
+  background-color: white;
+  top:75px;
+}
+
+#quadrado2{
+  position: relative;
+  width: 1px;
+  height: 150px;
+  background-color: white;
+  left:50%;
+}
+
 #nome{
-  position:absolute;
-  top:3.4%;
+  position: absolute;
+  top:49.88335px;
   left: 50%;
-  transform: translateY(50%);
+  border: 1px solid white;
   color: white;
+  transform: translate(-50%);
   margin: 0;
   padding: 0;
+  height: 90px;
+  width: 90px;
   font-family:  Franklin Gothic;
 
 }
