@@ -17,6 +17,10 @@ var follow = 0;
 array_mensagens = [];
 const mensagens = {
 
+    "":{
+        titulo: "Parênteses apenas com número",
+        descricao: "Simplesmente desfaça o parênteses"
+    },
     "^":{
         titulo: "Pontenciação",
         descricao:"Farei uma descrição melhor!"
