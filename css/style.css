@@ -303,7 +303,7 @@ header{
 }
 
 #quadrado{
-  position: relative;
+  position: absolute;
   width: 100%;
   height: 1px;
   background-color: white;
@@ -311,7 +311,7 @@ header{
 }
 
 #quadrado2{
-  position: relative;
+  position: absolute;
   width: 1px;
   height: 150px;
   background-color: white;
@@ -320,15 +320,15 @@ header{
 
 #nome{
   position: absolute;
-  top:49.88335px;
+  top:33%;
   left: 50%;
-  border: 1px solid white;
+  /* border: 1px solid white; */
   color: white;
-  transform: translate(-50%);
+  transform: translate(-50%,-50%);
   margin: 0;
   padding: 0;
-  height: 90px;
-  width: 90px;
+  height: 300px;
+  width: 300px;
   font-family:  Franklin Gothic;
 
 }
@@ -337,7 +337,7 @@ header{
     border: 1px solid white;
     border-radius: 4px;
     position: absolute;
-    top: 13.5317%;
+    top: 66%;
     left: 50%;
     transform: translateX(-50%);
     /* left:50%; */
@@ -353,9 +353,11 @@ header{
   #ParseExpression{
     height: 50px;
     width:70px;
-    top: 13.5317%;  /* 13.53 % do altura da tela desce esse valor em pixel */
+    top: 66%;  /* 13.53 % do altura da tela desce esse valor em pixel */
     left: 50%; 
-    transform: translate(435%); /* 305px é metade do tamanho do input o botão resolver estava na metade dessa caixa
+
+    transform: translate(435%); 
+    /* 305px é metade do tamanho do input o botão resolver estava na metade dessa caixa
     isso significa que tenho que andar mais 305px para ir até o final, uma forma de fazer isso é usar o translate daí fiz 
     sendo 70px a largura do botão resolver, tenho que saber quantas vezes cabe 70 em 305, o que dá 4,35, daí só tenho 
     que transladar 435% para andar 305px */
