@@ -812,8 +812,8 @@ function Eh_envolvida_por_paretenses( number){
 
 
 const analyzeExpression  = (expressao) =>{
-    const regex_power = /pow\(([+-]?\d+),([+-]?\d+))/
-    expressao = expressao.replace(regex_power,"$1^$2");
+    const regex_power = /pow\(([+-]?\d+),([+-]?\d+)\)/g
+    expressao = expressao.replace(regex_power,"$1^$2"); 
     console.log("expressão entrada " + expressao);
     expressao = Eh_envolvida_por_paretenses(expressao);
     console.log("expressão tratada " + expressao);
