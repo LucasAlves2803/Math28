@@ -422,7 +422,7 @@ for(let i of expression){
                 //  sub_criada = true; // deixa ativado uma booleana indicando que uma subexpressão foi criada, permitindo, caso necessário, empilhar um símbolo para que as subárvores sejam criadas corretamente
                 //  console.log('Subexpressão separada', subexpressao); 
                 //  postfix_stack.push(subexpressao[0]); // recoloca o primeiro operador da subexpressão na pilha pós fixa
-                console.log("Tamanho da subexpressão " + subexpressao.length);
+                console.log("Tamanho da subexpressão " + subexpressao.length + "Elementos da subexpressão " + subexpressao);
                 if (subexpressao.length != 0){ // se entra no if com toda a certeza uma subexpressão foi criada
                     // para saber se é necessário preencher o vazio deixado pela subexpressão retirada, é preciso olhar o que tem antes
                     // da subexpressão e o que vem depois, se antes da subexpressão retirada houver um operador (-,+,*,/) então é necessário preencher o vazio
