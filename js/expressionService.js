@@ -1,5 +1,7 @@
 console.log("Olá Mundo!")
 console.log("Estou voltando a programar depois de muito tempo!")
+console.log("Estou na nova Branch, o algoritmo antigo será substituído por esse novo algoritmo mais completo, e o meu objetivo é ganhar muito dinheiro, nunca vou esquecer isso!");
+
 // super_expressao = require('../public/Mathquill');
 
 // console.log(super_expressao.expressao);
