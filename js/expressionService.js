@@ -1,8 +1,129 @@
 console.log("Olá Mundo!")
 console.log("Estou voltando a programar depois de muito tempo!")
+// 30/01/2026 Começando uma fase difícil do Mathproject
+// Trocarei toda a parte de leitura da entrada, não vou usar mais a notação polonesa reversa
+// usarei o algoritmo que usa a gramática matemática
 console.log("Estou na nova Branch, o algoritmo antigo será substituído por esse novo algoritmo mais completo, e o meu objetivo é ganhar muito dinheiro, nunca vou esquecer isso!");
 
 // super_expressao = require('../public/Mathquill');
+
+
+
+class FormaFuncional{
+    
+    constructor(text ){
+        this.token = text.match(/\d+\.\d+|\d+|[a-zA-Z_][a-zA-Z0-9_]*|\*\*|[-+*/^%()]/g);
+        this.pos = 0;
+        this.vars = {'pi': 'pi','e': 'e', 'x':'x', 
+             'a': 'a', 'b':'b', 'c':'c', 
+            'd':'d', 'f':'f', 'g':'g', 
+            'h':'h', 'i':'i', 'j':'j', 
+            'k':'k', 'l':'l', 'm':'m',
+             'n':'n', 'o':'o', 'p': 'p',
+              'r' : 'r' , 's':'s', 't':'t'
+            , 'u': 'u', 'v':'v', 'w':'w', 'x':'x', 'y':'y', 'z':'z'}; // dicionário que armazena as variáveis permitidas
+        this.funcpermitidas = {'sin': 'sin', 'cos': 'cos', 'tan': 'tan', 'log': 'log', 'sqrt': 'sqrt', 'cbrt': 'cbrt', 'abs': 'abs', 'exp': 'exp'};
+        
+        function currentToken(){
+            if (this.pos < this.token.length)
+                return this.token[this.pos];
+            else
+                return null;
+        }
+
+        function eatToken(expectedToken){
+            currentToken = this.currentToken();
+            if (currentToken === expectedToken){
+                this.pos++;
+            } else {
+                throw new Error(`Token inesperado: esperado ${expectedToken}, mas encontrado ${currentToken}`);
+            }
+        }
+
+    function parseExpression(){
+        let node = this.parseTerm();
+        while (this.currentToken() === '+' || this.currentToken() === '-') {
+            let token = this.currentToken();
+            this.eatToken(token);
+            let right = this.parseTerm();
+            if (token === '+'){
+                return "Add(" + node + ", " + right + ")";
+            } else {
+                return "Sub(" + node + ", " + right + ")";
+            }
+        }
+        return node;
+    }
+
+    function parseTerm(){
+        let node = this.parsePower();
+        while (this.currentToken() === '*' || this.currentToken() === '/') {
+            let token = this.currentToken();
+            this.eatToken(token);
+            let right = this.parsePower();
+            if (token === '*'){
+                return "Mul(" + node + ", " + right + ")";
+            } else {
+                return "Div(" + node + ", " + right + ")";
+            }
+        }
+        return node;
+    }
+    function parsePower(){
+        let node = this.parseUnary();
+        while (this.currentToken() === '^') {
+            let token = this.currentToken();
+            this.eatToken(token);
+            let right = this.parseUnary();
+            return "Pow(" + node + ", " + right + ")";
+        }
+        return node;  
+    }
+    
+    function parseUnary(){
+        if (this.currentToken() === '+') {
+            this.eatToken('+');
+            return this.parseUnary();
+
+        } else if (this.currentToken() === '-') {   
+            this.eatToken('-');
+            return "Neg(" + this.parseUnary() + ")";
+        } else {   
+            return this.parseAtom();
+        }
+    }
+
+    function parseAtom(){
+
+        let token = this.currentToken();
+
+        if (!isNaN(token)) { // número
+            this.eatToken(token);
+            return "Num(" + token + ")";
+        } else if (token in this.vars) { // variável   
+            this.eatToken(token);
+            return this.vars[token];
+        }else if (token in this.funcpermitidas){ // função matemática
+            this.eatToken(token); // consome o nome da função]
+            this.eatToken('('); // consome o abre parênteses
+            let arg = this.parseExpression();
+            this.eatToken(')'); // consome o fecha parênteses
+            return token + "(" + arg + ")";
+        } else if (token === '(') { // expressão entre parênteses
+
+            this.eatToken('(');
+            let node = this.parseExpression();
+            this.eatToken(')');
+            return node;
+        } else {    
+            throw new Error(`Token inesperado: ${token}`);
+        }
+     }
+  }
+}
+    
+
+
 
 // console.log(super_expressao.expressao);
 
@@ -812,13 +933,18 @@ function Eh_envolvida_por_paretenses( number){
 }
 
 
+function ExpressaoNoFormatoFuncional(expressao){   
+
+}
+
+
 
 const analyzeExpression  = (expressao) =>{
     const regex_power = /pow\(([+-]?\d+),([+-]?\d+)\)/g
     expressao = expressao.replace(regex_power,"$1^$2"); 
     console.log("expressão entrada " + expressao);
-    expressao = Eh_envolvida_por_paretenses(expressao);
-    console.log("expressão tratada " + expressao);
+    //expressao = Eh_envolvida_por_paretenses(expressao);
+    //console.log("expressão tratada " + expressao);
     follow = 0; // o follow tem que ser zerado toda vez que uma nova expressão é chamada, a declaração do follow no escopo global (fora das funções) só é carregada quando o código é carregado no início (quando o servidor é ligado), por isso 
     // quando uma nova expressão do front end é recebida o valor do follow é o que foi armazenado por último na execução anterior e isso causa um efeito colateral na expressão atual 
     // por isso zero o follow aqui
@@ -827,7 +953,8 @@ const analyzeExpression  = (expressao) =>{
     pilha_de_nos = [];
     ocorrencia = 0;
     Operadores.freq_abre_parenteses =0;
-    expressao = criaExpressaoPosfixa(expressao);
+    //expressao = criaExpressaoPosfixa(expressao);
+    expressao = ExpressaoNoFormatoFuncional(expressao);
     try { // 28/11/2024 trecho que avalia se o retorna da função CriaExpressãoPosfixa é uma string de expressão numérica ou uma string de texto
         // se for uma expressão numérica significa que ela não tem nenhum erro
         // se for uma string de texto significa que a expressão numérica tem erros
