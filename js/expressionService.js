@@ -12,7 +12,7 @@ console.log("Estou na nova Branch, o algoritmo antigo será substituído por ess
 class FormaFuncional{
     
     constructor(text ){
-        this.token = text.match(/\d+\.\d+|\d+|[a-zA-Z_][a-zA-Z0-9_]*|\*\*|[-+*/^%()]/g);
+        this.token = text.match(/\d+\.\d+|\d+|[a-zA-Z_][a-zA-Z0-9_]*|\*\*|[-+*/^%()=]/g);
         this.pos = 0;
         this.vars = {'pi': 'pi','e': 'e', 'x':'x', 
              'a': 'a', 'b':'b', 'c':'c', 
@@ -23,77 +23,89 @@ class FormaFuncional{
               'r' : 'r' , 's':'s', 't':'t'
             , 'u': 'u', 'v':'v', 'w':'w', 'x':'x', 'y':'y', 'z':'z'}; // dicionário que armazena as variáveis permitidas
         this.funcpermitidas = {'sin': 'sin', 'cos': 'cos', 'tan': 'tan', 'log': 'log', 'sqrt': 'sqrt', 'cbrt': 'cbrt', 'abs': 'abs', 'exp': 'exp'};
-        
-        function currentToken(){
+    }
+        currentToken(){ // Essa função retorna o token na agulha
             if (this.pos < this.token.length)
                 return this.token[this.pos];
             else
                 return null;
-        }
+        };
 
-        function eatToken(expectedToken){
-            currentToken = this.currentToken();
+        eatToken(expectedToken){
+            let currentToken = this.currentToken();
             if (currentToken === expectedToken){
                 this.pos++;
             } else {
                 throw new Error(`Token inesperado: esperado ${expectedToken}, mas encontrado ${currentToken}`);
             }
-        }
+        };
 
-    function parseExpression(){
+     parseEquals(){
+        let node = this.parseExpression();
+         while (this.currentToken() === '=') {
+            this.eatToken('=');
+            let right = this.parseExpression();
+            node =  "Eq(" + node + ", " + right + ")";
+        } 
+        return node;
+    }   
+
+     parseExpression(){
         let node = this.parseTerm();
         while (this.currentToken() === '+' || this.currentToken() === '-') {
             let token = this.currentToken();
             this.eatToken(token);
             let right = this.parseTerm();
             if (token === '+'){
-                return "Add(" + node + ", " + right + ")";
+                node = "Add(" + node + ", " + right + ")";
             } else {
-                return "Sub(" + node + ", " + right + ")";
+                node = "Sub(" + node + ", " + right + ")";
             }
         }
         return node;
     }
 
-    function parseTerm(){
+    parseTerm(){
         let node = this.parsePower();
         while (this.currentToken() === '*' || this.currentToken() === '/') {
             let token = this.currentToken();
             this.eatToken(token);
             let right = this.parsePower();
             if (token === '*'){
-                return "Mul(" + node + ", " + right + ")";
+                node = "Mul(" + node + ", " + right + ")";
             } else {
-                return "Div(" + node + ", " + right + ")";
+                node = "Div(" + node + ", " + right + ")";
             }
         }
         return node;
     }
-    function parsePower(){
+    parsePower(){
         let node = this.parseUnary();
         while (this.currentToken() === '^') {
             let token = this.currentToken();
             this.eatToken(token);
             let right = this.parseUnary();
-            return "Pow(" + node + ", " + right + ")";
+            node = "Pow(" + node + ", " + right + ")";
         }
         return node;  
     }
     
-    function parseUnary(){
+    parseUnary(){
         if (this.currentToken() === '+') {
             this.eatToken('+');
             return this.parseUnary();
 
         } else if (this.currentToken() === '-') {   
             this.eatToken('-');
-            return "Neg(" + this.parseUnary() + ")";
+            node = "Neg(" + this.parseUnary() + ")";
         } else {   
             return this.parseAtom();
         }
     }
 
-    function parseAtom(){
+    
+
+    parseAtom(){
 
         let token = this.currentToken();
 
@@ -119,11 +131,17 @@ class FormaFuncional{
             throw new Error(`Token inesperado: ${token}`);
         }
      }
-  }
 }
-    
 
 
+
+
+expression ='2 + 0 = 0';    
+
+calc = new FormaFuncional(expression);
+console.log(calc);
+
+console.log(calc.parseEquals());
 
 // console.log(super_expressao.expressao);
 
