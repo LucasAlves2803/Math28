@@ -21,7 +21,7 @@ class FormaFuncional{
             'k':'k', 'l':'l', 'm':'m',
              'n':'n', 'o':'o', 'p': 'p',
               'r' : 'r' , 's':'s', 't':'t'
-            , 'u': 'u', 'v':'v', 'w':'w', 'x':'x', 'y':'Var(y)', 'z':'z'}; // dicionário que armazena as variáveis permitidas
+            , 'u': 'u', 'v':'v', 'w':'w', 'x':'x', 'y':'y', 'z':'z'}; // dicionário que armazena as variáveis permitidas
         this.funcpermitidas = {'sin': 'sin', 'cos': 'cos', 'tan': 'tan', 'log': 'log', 'sqrt': 'sqrt', 'cbrt': 'cbrt', 'abs': 'abs', 'exp': 'exp'};
     }
         currentToken(){ // Essa função retorna o token na agulha
@@ -45,7 +45,7 @@ class FormaFuncional{
          while (this.currentToken() === '=') {
             this.eatToken('=');
             let right = this.parseExpression();
-            node =  `{type: 'Eq', left: ${node}, right: ${right}}`;
+            node =  `{"type": "Eq", "left": ${node}, "right": ${right}}`;
         } 
         return node;
     }   
@@ -56,7 +56,7 @@ class FormaFuncional{
             let token = this.currentToken();
             this.eatToken(token);
             let right = this.parseTerm();
-            node = `{type: '${token === '+' ? 'Add' : 'Sub'}', left: ${node}, right: ${right}}`;
+            node = `{"type": "${token === '+' ? "Add" : "Sub"}", "left": ${node}, "right": ${right}}`;
         }
         return node;
     }
@@ -67,7 +67,7 @@ class FormaFuncional{
             let token = this.currentToken();
             this.eatToken(token);
             let right = this.parsePower();
-            node = `{type: '${token === '*' ? 'Mul' : 'Div'}', left: ${node}, right: ${right}}`;
+            node = `{"type": "${token === '*' ? "Mul" : "Div"}", "left": ${node}, "right": ${right}}`;
               
         }
         return node;
@@ -78,7 +78,7 @@ class FormaFuncional{
             let token = this.currentToken();
             this.eatToken(token);
             let right = this.parseUnary();
-            let node = `{type: 'Pow', left: ${node}, right: ${right}}`;
+            node = `{"type": "Pow", "left": ${node}, "right": ${right}}`;
         }
         return node; 
     }
@@ -90,7 +90,7 @@ class FormaFuncional{
 
         } else if (this.currentToken() === '-') {   
             this.eatToken('-');
-             return `{type: 'Neg', value: ${this.parseUnary()}}`;
+             return `{ "type": "Neg", "value": ${this.parseUnary()} }`;
         } else {   
             return this.parseAtom();
         }
@@ -104,16 +104,16 @@ class FormaFuncional{
 
         if (!isNaN(token)) { // número
             this.eatToken(token);
-            return `{ type: 'Number', value: ${token} }`;
+            return `{ "type": "Number", "value": ${token} }`;
         } else if (token in this.vars) { // variável   
             this.eatToken(token);
-            return `{ type: 'Var', name: '${token}' }`;
+            return `{ "type": "Var", "name": "${token}" }`;
         }else if (token in this.funcpermitidas){ // função matemática
             this.eatToken(token); // consome o nome da função]
             this.eatToken('('); // consome o abre parênteses
             let arg = this.parseExpression();
             this.eatToken(')'); // consome o fecha parênteses
-            return `{ type: 'Func', name: '${token}', arg: ${arg} }`;
+            return `{ "type": "Func", "name": "${token}", "arg": ${arg} }`;
         } else if (token === '(') { // expressão entre parênteses
 
             this.eatToken('(');
@@ -124,17 +124,112 @@ class FormaFuncional{
             throw new Error(`Token inesperado: ${token}`);
         }
      }
+
+  toNary(expr) {
+    if (!expr || typeof expr !== "object") return expr;
+
+        if (expr.type === "Add") {
+            return {
+                type: "Add",
+            args: [
+                 ...this.flattenAdd(this.toNary(expr.left)),
+                 ...this.flattenAdd(this.toNary(expr.right))
+                ]
+            };
+        }
+
+        if (expr.type === "Mul") {
+            return {
+                type: "Mul",
+                args: [
+                    ...this.flattenMul(this.toNary(expr.left)),
+                    ...this.flattenMul(this.toNary(expr.right))
+                ]
+            };
+        }
+
+        if (expr.type === "Div") {
+            return {
+                type: "Div",
+                left: this.toNary(expr.left),
+                right: this.toNary(expr.right)
+            };
+        }
+
+        return expr;
+    }
+
+   flattenAdd(e) {
+    return e.type === "Add" ? e.args : [e];
+   }
+
+  flattenMul(e) {
+    return e.type === "Mul" ? e.args : [e];
+  }
+
+  normalize(expr) {
+  switch (expr.type) {
+
+    case "Add": {
+      let flat = [];
+
+      for (let a of expr.args) {
+        let na = this.normalize(a);
+
+        if (na.type === "Add") {
+          flat.push(...na.args);
+        } else {
+          flat.push(na);
+        }
+      }
+
+      return { type: "Add", args: flat };
+    }
+
+    case "Mul": {
+      let flat = [];
+
+      for (let a of expr.args) {
+        let na = this.normalize(a);
+
+        if (na.type === "Mul") {
+          flat.push(...na.args);
+        } else {
+          flat.push(na);
+        }
+      }
+
+      return { type: "Mul", args: flat };
+    }
+
+    case "Div":
+      return {
+        type: "Div",
+        left: this.normalize(expr.left),
+        right: this.normalize(expr.right)
+      };
+
+    default:
+      return expr;
+  }
+}
+
+
+
 }
 
 
 
 
-expression ='(2+x+1)/(2+x)';    
+expression ='sin(2+--2*x+3)';    
 
 calc = new FormaFuncional(expression);
 console.log(calc);
 
-console.log(calc.parseEquals());
+expression = JSON.parse(calc.parseEquals());
+expression = calc.toNary(expression);
+// expression = calc.normalize(expression);
+console.log(expression);
 
 // console.log(super_expressao.expressao);
 
