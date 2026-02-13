@@ -55,7 +55,7 @@ class FormaFuncional{
         while (this.currentToken() === '+' || this.currentToken() === '-') {
             let token = this.currentToken();
             this.eatToken(token);
-            let right = this.parseTerm();
+            let right = this.parseTerm();                                                                                                                                                                                                             
             node = `{"type": "${token === '+' ? "Add" : "Sub"}", "left": ${node}, "right": ${right}}`;
         }
         return node;
@@ -113,7 +113,7 @@ class FormaFuncional{
             this.eatToken('('); // consome o abre parênteses
             let arg = this.parseExpression();
             this.eatToken(')'); // consome o fecha parênteses
-            return `{ "type": "Func", "name": "${token}", "arg": ${arg} }`;
+            return `{ "type": "Funcao", "name": "${token}", "arg": ${arg} }`;
         } else if (token === '(') { // expressão entre parênteses
 
             this.eatToken('(');
@@ -125,6 +125,9 @@ class FormaFuncional{
         }
      }
 
+
+   
+  // transforma o json binário em um json n-ário, ou seja, transforma as expressões do tipo (2+3)+4 em 2+3+4, ou seja, transforma uma árvore binária em uma árvore n-ária, isso é necessário para facilitar a implementação de algumas funções, como a função de simplificação de expressões, que se torna mais fácil de implementar quando a expressão é representada por uma árvore n-ária, porque a função de simplificação de expressões precisa lidar com expressões do tipo 2+3+4, e não com expressões do tipo (2+3)+4, ou seja, a função de simplificação de expressões precisa lidar com árvores n-árias, e não com árvores binárias
   toNary(expr) {
     if (!expr || typeof expr !== "object") return expr;
 
@@ -167,69 +170,239 @@ class FormaFuncional{
     return e.type === "Mul" ? e.args : [e];
   }
 
+  
   normalize(expr) {
-  switch (expr.type) {
+    switch (expr.type) {
 
-    case "Add": {
-      let flat = [];
+        case "Add": {
+            let flat = [];
 
-      for (let a of expr.args) {
-        let na = this.normalize(a);
+              for (let a of expr.args) {
+                let na = this.normalize(a);
 
-        if (na.type === "Add") {
-          flat.push(...na.args);
-        } else {
-          flat.push(na);
+                if (na.type === "Add") {
+                    flat.push(...na.args);
+                } else {
+                    flat.push(na);
+            }
         }
-      }
 
-      return { type: "Add", args: flat };
+        return { type: "Add", args: flat };
     }
 
-    case "Mul": {
-      let flat = [];
+        case "Mul": {
+            let flat = [];
 
-      for (let a of expr.args) {
-        let na = this.normalize(a);
+            for (let a of expr.args) {
+                let na = this.normalize(a);
 
-        if (na.type === "Mul") {
-          flat.push(...na.args);
-        } else {
-          flat.push(na);
+                if (na.type === "Mul") {
+                    flat.push(...na.args);
+                } else {
+                    flat.push(na);
+                }
         }
-      }
 
-      return { type: "Mul", args: flat };
+        return { type: "Mul", args: flat };
     }
 
-    case "Div":
-      return {
-        type: "Div",
-        left: this.normalize(expr.left),
-        right: this.normalize(expr.right)
-      };
+        case "Div":
+            return {
+                type: "Div",
+                left: this.normalize(expr.left),
+                right: this.normalize(expr.right)
+            };
 
-    default:
-      return expr;
+        default:
+            return expr;
   }
 }
 
 
 
+
+match(pattern, expr, bindings = {}) {
+
+  // 1) pattern é uma variável de padrão
+  if (pattern.type === "Pattern") {
+    if (!(pattern.name in bindings)) {
+      // cria novo binding
+      bindings[pattern.name] = expr;
+      return bindings;
+    }
+
+    // já tinha binding -> exige igualdade estrutural
+    return this.deepEquals(bindings[pattern.name], expr)
+      ? bindings
+      : null;
+  }
+
+  // 2) tipos diferentes falham
+  if (pattern.type !== expr.type) return null;
+
+  // 3) casos de tipos concretos
+  switch (pattern.type) {
+
+    case "Number":
+      return pattern.value === expr.value ? bindings : null;
+
+    case "Var":
+      return pattern.name === expr.name ? bindings : null;
+
+    case "Div":
+      // unifica recursivamente
+      let b1 = this.match(pattern.left, expr.left, { ...bindings });
+      if (!b1) return null;
+      return this.match(pattern.right, expr.right, b1);
+
+    case "Pow":
+      let b2 = this.match(pattern.base, expr.base, { ...bindings });
+      if (!b2) return null;
+      return this.match(pattern.exp, expr.exp, b2);
+
+    case "Add":
+    case "Mul":
+      // associativo com lista de args
+      return this.matchArgs(pattern.args, expr.args, bindings);
+
+    default:
+      return null;
+  }
+}
+
+matchArgs(patts, exprs, bindings) {
+  if (patts.length !== exprs.length) return null;
+
+  let current = { ...bindings };
+
+  for (let i = 0; i < patts.length; i++) {
+    current = this.match(patts[i], exprs[i], current);
+    if (!current) return null;
+  }
+  return current;
+}
+
+// deepEquals estrutural simples
+deepEquals(a, b) {
+  if (a.type !== b.type) return false;
+
+  switch (a.type) {
+    case "Number":
+      return a.value === b.value;
+    case "Var":
+      return a.name === b.name;
+    case "Div":
+      return this.deepEquals(a.left, b.left) && this.deepEquals(a.right, b.right);
+    case "Pow":
+      return this.deepEquals(a.base, b.base) && this.deepEquals(a.exp, b.exp);
+    case "Add":
+    case "Mul":
+      if (a.args.length !== b.args.length) return false;
+      for (let i = 0; i < a.args.length; i++) {
+        if (!this.deepEquals(a.args[i], b.args[i])) return false;
+      }
+      return true;
+  }
+}
+
+substitute(pattern, bindings) {
+
+  if (pattern.type === "Pattern") {
+    return bindings[pattern.name];
+  }
+
+  if ("value" in pattern) return pattern;
+  if ("name" in pattern) return pattern;
+
+  switch (pattern.type) {
+    case "Div":
+      return {
+        type: "Div",
+        left: this.substitute(pattern.left, bindings),
+        right: this.substitute(pattern.right, bindings)
+      };
+
+    case "Pow":
+      return {
+        type: "Pow",
+        base: this.substitute(pattern.base, bindings),
+        exp: this.substitute(pattern.exp, bindings)
+      };
+
+    case "Add":
+    case "Mul":
+      return {
+        type: pattern.type,
+        args: pattern.args.map(arg => this.substitute(arg, bindings))
+      };
+  }
+}
+
+rewrite(expr, rules) {
+
+  // 1️⃣ tenta aplicar regra no nó atual
+  for (let rule of rules) {
+    const bindings = this.match(rule.pattern, expr);
+    if (bindings) {
+      const replaced = this.substitute(rule.result, bindings);
+      // reaplica rewrite para pegar novas oportunidades
+      return this.rewrite(replaced, rules);
+    }
+  }
+
+  // 2️⃣ se nenhuma regra casou, tenta nos filhos
+  if (expr.args) {
+    return {
+      ...expr,
+      args: expr.args.map(arg => this.rewrite(arg, rules))
+    };
+  }
+
+  if (expr.left) {
+    return {
+      ...expr,
+      left: this.rewrite(expr.left, rules),
+      right: this.rewrite(expr.right, rules)
+    };
+  }
+
+  return expr;
 }
 
 
 
+}
 
-expression ='sin(2+--2*x+3)';    
+function P(name) {
+  return { type: "Pattern", name }
+};
+
+
+
+
+expression = '(2+2)/(2+2)-1';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+
+const rules = [
+  {
+    pattern: {
+      type: "Div",
+      left: P("a"),
+      right: P("a")
+    },
+    result: { type: "Num", value: 1 }
+  }
+];
+
 
 calc = new FormaFuncional(expression);
 console.log(calc);
 
-expression = JSON.parse(calc.parseEquals());
-expression = calc.toNary(expression);
+
+// expression = JSON.parse(calc.parseEquals());
+// expression = calc.toNary(expression);
 // expression = calc.normalize(expression);
-console.log(expression);
+expression = calc.rewrite(calc.normalize(calc.toNary(JSON.parse(calc.parseEquals()))), rules);
+console.log("Expressão final: " + JSON.stringify(expression));
 
 // console.log(super_expressao.expressao);
 
