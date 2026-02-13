@@ -123,7 +123,7 @@ class FormaFuncional{
         } else {    
             throw new Error(`Token inesperado: ${token}`);
         }
-     }
+    }
 
 
    
@@ -354,7 +354,7 @@ rewrite(expr, rules) {
     if (bindings) {
       const replaced = this.substitute(rule.result, bindings);
       // reaplica rewrite para pegar novas oportunidades
-      console.log("Simplificando a expressão" + JSON.stringify(expr) + " para " + JSON.stringify(replaced) + " usando a regra " + JSON.stringify(rule));
+      console.log("Simplificando a expressão " + this.impressao(expr) + " para " + this.impressao(replaced) + " usando a regra  x/x é igual a 1 caso x != 0" );
       return this.rewrite(replaced, rules);
     }
   }
@@ -378,6 +378,27 @@ rewrite(expr, rules) {
   return expr;
 }
 
+    impressao(expr) {
+        switch(expr.type) {
+            case "Number":
+            case "Var":
+                return expr.value || expr.name;
+            case "Add":
+            case "Mul":
+                return expr.args.map(arg => this.impressao(arg)).join(expr.type === "Add" ? " + " : " * ");
+            case "Div":
+                return `(${this.impressao(expr.left)}) / (${this.impressao(expr.right)})`;
+            case "Sub":
+                return `(${this.impressao(expr.left)}) - (${this.impressao(expr.right)})`;
+            case "Pow":
+                return `${this.impressao(expr.base)}^${this.impressao(expr.exp)}`;
+            case "Neg":
+                return `-${this.impressao(expr.value)}`;
+            case "Funcao":
+                return `${expr.name}(${this.impressao(expr.arg)})`;
+        }
+    }
+
 
 
 }
@@ -389,7 +410,7 @@ function P(name) {
 
 
 
-expression = '(2+2)/(2+2)-1';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+expression = '1 + ((2+3)/(2+3))/((2+3)/(2+3)) + 2';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 
 const rules = [
   {
@@ -398,8 +419,9 @@ const rules = [
       left: P("a"),
       right: P("a")
     },
-    result: { type: "Num", value: 1 }
-  }
+    result: { type: "Number", value: 1 }
+  },
+  
 ];
 
 
@@ -411,7 +433,7 @@ console.log(calc);
 // expression = calc.toNary(expression);
 // expression = calc.normalize(expression);
 expression = calc.rewrite(calc.normalize(calc.toNary(JSON.parse(calc.parseEquals()))), rules);
-console.log("Expressão final: " + JSON.stringify(expression));
+console.log("Expressão final: " + calc.impressao(expression));
 
 // console.log(super_expressao.expressao);
 
