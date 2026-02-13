@@ -159,6 +159,14 @@ class FormaFuncional{
             };
         }
 
+        if (expr.type === "Sub"){
+            return{
+                type: "Sub",
+                left: this.toNary(expr.left),
+                right: this.toNary(expr.right)
+            };
+        }
+
         return expr;
     }
 
@@ -346,6 +354,7 @@ rewrite(expr, rules) {
     if (bindings) {
       const replaced = this.substitute(rule.result, bindings);
       // reaplica rewrite para pegar novas oportunidades
+      console.log("Simplificando a expressão" + JSON.stringify(expr) + " para " + JSON.stringify(replaced) + " usando a regra " + JSON.stringify(rule));
       return this.rewrite(replaced, rules);
     }
   }
