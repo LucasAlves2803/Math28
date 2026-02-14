@@ -354,7 +354,7 @@ rewrite(expr, rules) {
     if (bindings) {
       const replaced = this.substitute(rule.result, bindings);
       // reaplica rewrite para pegar novas oportunidades
-      console.log("Simplificando a expressão " + this.impressao(expr) + " para " + this.impressao(replaced) + " usando a regra  x/x é igual a 1 caso x != 0" );
+      console.log("Simplificando a expressão " + this.impressao(expr) + " para " + this.impressao(replaced));
       return this.rewrite(replaced, rules);
     }
   }
@@ -382,10 +382,14 @@ rewrite(expr, rules) {
         switch(expr.type) {
             case "Number":
             case "Var":
-                return expr.value || expr.name;
+                if (expr.value != 0){
+                    return expr.value || expr.name;
+                }else{
+                    return 0;
+                }  
             case "Add":
             case "Mul":
-                return expr.args.map(arg => this.impressao(arg)).join(expr.type === "Add" ? " + " : " * ");
+                return " (" + expr.args.map(arg => this.impressao(arg)).join(expr.type === "Add" ? " + " : " * ") + ")";
             case "Div":
                 return `(${this.impressao(expr.left)}) / (${this.impressao(expr.right)})`;
             case "Sub":
@@ -410,7 +414,8 @@ function P(name) {
 
 
 
-expression = '1 + ((2+3)/(2+3))/((2+3)/(2+3)) + 2';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+expression = '(2*3)+ (2*4)'; 
+console.log("Expressão original: " + expression);
 
 const rules = [
   {
@@ -421,7 +426,42 @@ const rules = [
     },
     result: { type: "Number", value: 1 }
   },
-  
+  {
+    pattern: {
+        type: "Mul",
+        args: [P("a"), { type: "Number", value: 0 }]
+    },
+    result: { type: "Number", value: 0 }
+  },
+  {
+    pattern: {
+        type: "Mul",
+        args: [P("a"), { type: "Number", value: 1 }]
+    },
+    result: P("a")
+    },
+  {
+        pattern: {
+            type: "Add",
+            args: [P("a"), { type: "Number", value: 0 }]
+        },
+        result: P("a")
+  },
+//   {
+//     pattern: {
+//         type: "Mul",
+//         args: [P("a"), { type: "Add", args: [P("b"), P("c")] }]
+//     },
+//     result: { type: "Add", args: [{ type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] }] }
+//   },
+  {
+    pattern: {
+        type: "Add",
+        args: [ { type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] } ]
+    },
+    result: { type: "Mul", args: [P("a"), { type: "Add", args: [P("b"), P("c")] }] }
+  }
+
 ];
 
 
@@ -429,10 +469,11 @@ calc = new FormaFuncional(expression);
 console.log(calc);
 
 
-// expression = JSON.parse(calc.parseEquals());
-// expression = calc.toNary(expression);
-// expression = calc.normalize(expression);
-expression = calc.rewrite(calc.normalize(calc.toNary(JSON.parse(calc.parseEquals()))), rules);
+expression = JSON.parse(calc.parseEquals());
+expression = calc.toNary(expression);
+expression = calc.normalize(expression);
+console.log("Expressão após a conversão para árvore n-ária: " + JSON.stringify(expression));
+expression = calc.rewrite(expression, rules);
 console.log("Expressão final: " + calc.impressao(expression));
 
 // console.log(super_expressao.expressao);
