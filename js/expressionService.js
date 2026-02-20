@@ -227,7 +227,127 @@ class FormaFuncional{
 }
 
 
+canonicalize(expr) {
 
+  switch(expr.type) {
+
+    case "Add":
+    case "Mul":
+
+      let args = expr.args.map(a => this.canonicalize(a));
+
+      args.sort((a,b) => this.compareExpr(a,b));
+
+      return {
+        type: expr.type,
+        args
+      };
+
+    case "Div":
+      return {
+        type: "Div",
+        left: this.canonicalize(expr.left),
+        right: this.canonicalize(expr.right)
+      };
+
+    default:
+      return expr;
+  }
+}
+
+
+compareExpr(a,b) {
+
+  const order = {
+    "Number": 0,
+    "Var": 1,
+    "Pow": 2,
+    "Mul": 3,
+    "Add": 4,
+    "Div": 5
+  };
+
+  if (order[a.type] !== order[b.type])
+    return order[a.type] - order[b.type];
+
+  if (a.type === "Number")
+    return a.value - b.value;
+
+  if (a.type === "Var")
+    return a.name.localeCompare(b.name);
+
+  return JSON.stringify(a).localeCompare(JSON.stringify(b)); // ordena os valores do array args em ordem
+}
+
+
+simplifyConstants(expr) {
+
+
+switch(expr.type) {
+  case "Add": {
+
+    let sum = 0;
+    let others = [];
+
+    for (let arg of expr.args) {
+
+      if (arg.type === "Number")
+        sum += arg.value;
+      else
+        others.push(arg);
+    }
+
+    if (sum !== 0)
+      others.unshift({ type:"Number", value: sum });
+
+    return others.length === 1 ? others[0] : {
+      type:"Add",
+      args: others
+    };
+  }
+  case "Mul": { 
+    let product = 1;
+    let others = [];
+    for (let arg of expr.args) {
+        if (arg.type === "Number")
+            product *= arg.value;
+        else
+            others.push(arg);
+    }
+    if (product === 0) return { type: "Number", value: 0 };
+
+    if (product !== 1)  
+        others.unshift({ type: "Number", value: product });
+    return others.length === 1 ? others[0] : {
+        type: "Mul",
+        args: others
+    };
+    }
+ case "Div": {
+        let num = this.simplifyConstants(expr.left);
+        let den = this.simplifyConstants(expr.right);
+
+        if (den.type === "Number" && den.value === 0) {
+            throw new Error("Division by zero");
+        }
+
+        return {
+            type: "Div",
+            left: num,
+            right: den
+        };
+    }
+  case "Sub": {
+    let left = this.simplifyConstants(expr.left);
+    let right = this.simplifyConstants(expr.right);
+    return {
+      type: "Sub",
+      left,
+      right
+    };
+   }
+  }
+ }
 
 match(pattern, expr, bindings = {}) {
 
@@ -257,6 +377,7 @@ match(pattern, expr, bindings = {}) {
     case "Var":
       return pattern.name === expr.name ? bindings : null;
 
+    case "Sub":   
     case "Div":
       // unifica recursivamente
       let b1 = this.match(pattern.left, expr.left, { ...bindings });
@@ -299,6 +420,7 @@ deepEquals(a, b) {
       return a.value === b.value;
     case "Var":
       return a.name === b.name;
+    case "Sub":
     case "Div":
       return this.deepEquals(a.left, b.left) && this.deepEquals(a.right, b.right);
     case "Pow":
@@ -323,6 +445,7 @@ substitute(pattern, bindings) {
   if ("name" in pattern) return pattern;
 
   switch (pattern.type) {
+    
     case "Div":
       return {
         type: "Div",
@@ -337,12 +460,20 @@ substitute(pattern, bindings) {
         exp: this.substitute(pattern.exp, bindings)
       };
 
+    case "Sub":
+        return {
+            type: "Sub",
+            left: this.substitute(pattern.left, bindings),
+            right: this.substitute(pattern.right, bindings)
+    };  
+
     case "Add":
     case "Mul":
       return {
         type: pattern.type,
         args: pattern.args.map(arg => this.substitute(arg, bindings))
       };
+  
   }
 }
 
@@ -355,7 +486,7 @@ rewrite(expr, rules) {
       const replaced = this.substitute(rule.result, bindings);
       // reaplica rewrite para pegar novas oportunidades
       console.log("Simplificando a expressão " + this.impressao(expr) + " para " + this.impressao(replaced));
-      return this.rewrite(replaced, rules);
+     return this.rewrite(replaced, rules);
     }
   }
 
@@ -414,11 +545,11 @@ function P(name) {
 
 
 
-expression = '(2*3)+ (2*4)'; 
+expression = "(2+3*3+4) / (2+3*3+4)"; 
 console.log("Expressão original: " + expression);
 
 const rules = [
-  {
+    {
     pattern: {
       type: "Div",
       left: P("a"),
@@ -454,14 +585,37 @@ const rules = [
 //     },
 //     result: { type: "Add", args: [{ type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] }] }
 //   },
-  {
-    pattern: {
-        type: "Add",
-        args: [ { type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] } ]
+    {
+        pattern: {
+            type: "Add",
+            args: [ { type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] } ]
+        },
+        result: { type: "Mul", args: [P("a"), { type: "Add", args: [P("b"), P("c")] }] }
     },
-    result: { type: "Mul", args: [P("a"), { type: "Add", args: [P("b"), P("c")] }] }
-  }
-
+    {
+        pattern:{
+            type: "Sub",
+            left: P("a"),
+            right: P("a")
+        },
+        result: { type: "Number", value: 0 }    
+    },
+    {
+        pattern:{
+            type: "Sub",
+            left: P("a"),
+            right: { type: "Number", value: 0 }
+        },
+        result: P("a")
+    },
+    { pattern: {
+        type: "Mul",
+        args: [P("a"), { type: "Sub", left: P("b"), right: P("c") }]
+    },
+    result: { type: "Sub", left: { type: "Mul", args: [P("a"), P("b")] }, right: { type: "Mul", args: [P("a"), P("c")] } 
+    }
+   }
+    
 ];
 
 
@@ -473,6 +627,8 @@ expression = JSON.parse(calc.parseEquals());
 expression = calc.toNary(expression);
 expression = calc.normalize(expression);
 console.log("Expressão após a conversão para árvore n-ária: " + JSON.stringify(expression));
+expression = calc.canonicalize(expression);
+expression = calc.simplifyConstants(expression);
 expression = calc.rewrite(expression, rules);
 console.log("Expressão final: " + calc.impressao(expression));
 
