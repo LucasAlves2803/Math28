@@ -226,7 +226,8 @@ class FormaFuncional{
   }
 }
 
-
+// Essa função ordena expressões de soma e multiplicação, ou seja, 4 + 1 + 2, se torna, 1 + 2 + 4, ordenou de forma crescente, e o mesmo vale caso fosse multiplicação, 4 * 1 * 2, vira 
+// 1 * 2 * 4, isso permite que árvores que tem os mesmos termos, mas em ordens diferentes, sejam consideradas iguais, ou seja, 4 + 1 + 2 e 1 + 2 + 4, são consideradas a mesma expressão, isso é importante para a função de simplificação de expressões, porque a função de simplificação de expressões precisa lidar com expressões do tipo 2 + 3 + 4 e 4 + 3 + 2, e essas expressões precisam ser consideradas iguais para que a função de simplificação de expressões funcione corretamente 
 canonicalize(expr) {
 
   switch(expr.type) {
@@ -249,6 +250,15 @@ canonicalize(expr) {
         left: this.canonicalize(expr.left),
         right: this.canonicalize(expr.right)
       };
+
+      case "Sub":   
+        return {
+            type: "Sub",
+            left: this.canonicalize(expr.left),
+            right: this.canonicalize(expr.right)    
+        };
+       
+       
 
     default:
       return expr;
