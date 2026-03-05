@@ -236,12 +236,24 @@ canonicalize(expr) {
     case "Mul":
 
       let args = expr.args.map(a => this.canonicalize(a));
-
       args.sort((a,b) => this.compareExpr(a,b));
+      
+      
+      if (JSON.stringify(expression).length !== JSON.stringify(expr).length && !this.compareArrays(expr.args, args)){
+        // esse trecho mostra a mensagem de ordenação da expressão, nesse 'if' verifica se a primeira expressão (variável "expression") e a parte que foi ordenada (variável "expr") tem tamanhos diferentes (se sim, significa que foi ordenado um trecho da expressão original, não a expressão inteira) e depois verifica se esse trecho da expressão já passada pela ordenada é diferente do trecho anterior a ordenação (se sim significa que houve mudanças logo faz sentido imprimir uma mensagem de explicação, senão significa que o trecho não mudou em nada mesmo depois da ordenação (o que acontece quando a 'expr' ja está naturalmente ordenada), logo não faz sentido imprimir uma mensagem de explicação)
+            console.log("Expressão "+ this.impressao(expression) + "no trecho " +   this.impressao(expr)  + "ordenada para " +   this.impressao({ type: expr.type, args }));
+            expression = JSON.stringify(expression).replace(JSON.stringify(expr), JSON.stringify({ type: expr.type, args }));
+            expression = JSON.parse(expression);
+      }else if (JSON.stringify(expression).length === JSON.stringify(expr).length && !this.compareArrays(expr.args, args)){
+            // esse 'if' primeiro verifica se a expressão original (variável "expression") e a expressão que foi ordenada (variável "expr") tem o mesmo tamanho (se sim, significa que a expressão inteira foi ordenada, (outro detalhe, ter o mesmo tamanho não significa que as expressões são exatamente iguais, a expressão original pode já está ordenada em outras partes, por ter passado pelo 'if' acima antes desse por causa da recursão, enquanto que a expressão (expr) está 'desatualizada')) e depois verifica se a expressão ( compareArrays(expr.args, args)) antes e depois da ordenação são diferentes (se sim, teve ordenação real, por isso é importante fazer uma explicação)
+            console.log("Expressão "+ this.impressao(expression) +  "ordenada para " +   this.impressao({ type: expr.type, args }));
+            expression = JSON.stringify(expression).replace(JSON.stringify(expr), JSON.stringify({ type: expr.type, args }));
+            expression = JSON.parse(expression);
+      }
 
-      return {
-        type: expr.type,
-        args
+        
+      return { type: expr.type, 
+            args 
       };
 
     case "Div":
@@ -251,22 +263,34 @@ canonicalize(expr) {
         right: this.canonicalize(expr.right)
       };
 
-      case "Sub":   
+    case "Sub":   
         return {
             type: "Sub",
             left: this.canonicalize(expr.left),
             right: this.canonicalize(expr.right)    
         };
        
-       
-
     default:
       return expr;
   }
 }
 
+compareArrays = (a, b) => {
+  if (a.length !== b.length) return false;
+  else {
+    // Comparing each element of your array
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
 
 compareExpr(a,b) {
+
 
   const order = {
     "Number": 0,
@@ -274,7 +298,8 @@ compareExpr(a,b) {
     "Pow": 2,
     "Mul": 3,
     "Add": 4,
-    "Div": 5
+    "Sub": 4,
+    "Div": 5,
   };
 
   if (order[a.type] !== order[b.type])
@@ -495,7 +520,7 @@ rewrite(expr, rules) {
     if (bindings) {
       const replaced = this.substitute(rule.result, bindings);
       // reaplica rewrite para pegar novas oportunidades
-      console.log("Simplificando a expressão " + this.impressao(expr) + " para " + this.impressao(replaced));
+     console.log("Simplificando a expressão " + this.impressao(expr) + " para " + this.impressao(replaced));
      return this.rewrite(replaced, rules);
     }
   }
@@ -555,7 +580,7 @@ function P(name) {
 
 
 
-expression = "(2+3*3+4) / (2+3*3+4)"; 
+expression = "34 + 100 + 2 + 10 + 4 + 3 * 2 * 100 * 23 * 12 * 3 * 1.3 * 1.1 + 0 + 0.1"; 
 console.log("Expressão original: " + expression);
 
 const rules = [
@@ -638,7 +663,7 @@ expression = calc.toNary(expression);
 expression = calc.normalize(expression);
 console.log("Expressão após a conversão para árvore n-ária: " + JSON.stringify(expression));
 expression = calc.canonicalize(expression);
-expression = calc.simplifyConstants(expression);
+// expression = calc.simplifyConstants(expression);
 expression = calc.rewrite(expression, rules);
 console.log("Expressão final: " + calc.impressao(expression));
 
