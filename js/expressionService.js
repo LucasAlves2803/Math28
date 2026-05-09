@@ -244,7 +244,7 @@ canonicalize(expr) {
             console.log("Expressão "+ this.impressao(expression) + "no trecho " +   this.impressao(expr)  + "ordenada para " +   this.impressao({ type: expr.type, args }));
             expression = JSON.stringify(expression).replace(JSON.stringify(expr), JSON.stringify({ type: expr.type, args }));
             expression = JSON.parse(expression);
-      }else if (JSON.stringify(expression).length === JSON.stringify(expr).length && !this.compareArrays(expr.args, args)){
+      }else if (JSON.stringify(expression).length === JSON.stringify(expr).length && this.compareArrays(expr.args, args)){
             // esse 'if' primeiro verifica se a expressão original (variável "expression") e a expressão que foi ordenada (variável "expr") tem o mesmo tamanho (se sim, significa que a expressão inteira foi ordenada, (outro detalhe, ter o mesmo tamanho não significa que as expressões são exatamente iguais, a expressão original pode já está ordenada em outras partes, por ter passado pelo 'if' acima antes desse por causa da recursão, enquanto que a expressão (expr) está 'desatualizada')) e depois verifica se a expressão ( compareArrays(expr.args, args)) antes e depois da ordenação são diferentes (se sim, teve ordenação real, por isso é importante fazer uma explicação)
             console.log("Expressão "+ this.impressao(expression) +  "ordenada para " +   this.impressao({ type: expr.type, args }));
             expression = JSON.stringify(expression).replace(JSON.stringify(expr), JSON.stringify({ type: expr.type, args }));
@@ -512,37 +512,88 @@ substitute(pattern, bindings) {
   }
 }
 
-rewrite(expr, rules) {
-
-  // 1️⃣ tenta aplicar regra no nó atual
+rewrite(expr, rules, steps = []) {
   for (let rule of rules) {
+
     const bindings = this.match(rule.pattern, expr);
-    if (bindings) {
-      const replaced = this.substitute(rule.result, bindings);
-      // reaplica rewrite para pegar novas oportunidades
-     console.log("Simplificando a expressão " + this.impressao(expr) + " para " + this.impressao(replaced));
-     return this.rewrite(replaced, rules);
+
+    if (bindings && (!rule.condition || rule.condition(bindings))) {
+
+      const replaced =
+        typeof rule.result === "function"
+          ? rule.result(bindings)
+          : this.substitute(rule.result, bindings);
+
+      steps.push({
+        before: expr,
+        after: replaced,
+        explanation: rule.explain(bindings)
+      });
+
+      return this.rewrite(replaced, rules, steps);
     }
   }
 
-  // 2️⃣ se nenhuma regra casou, tenta nos filhos
+  // recursivo nos filhos
   if (expr.args) {
-    return {
-      ...expr,
-      args: expr.args.map(arg => this.rewrite(arg, rules))
-    };
+    expr.args = expr.args.map(arg =>
+      this.rewrite(arg, rules, steps)
+    );
   }
 
-  if (expr.left) {
+  if (expr.left){
     return {
-      ...expr,
-      left: this.rewrite(expr.left, rules),
-      right: this.rewrite(expr.right, rules)
-    };
-  }
+        expr,
+        left: this.rewrite(expr.left, rules, steps),
+        right: this.rewrite(expr.right, rules, steps)
+    }
+  }  
 
+//   steps.map(step => {console.log("Aplicando regra: " + step.explanation + "\n antes era " + step.before + " agora é " + step.after)});   
+if (steps.length > 0){
+     console.log(`A expressão mudou de ${this.impressao(steps[steps.length-1].before)} para ${this.impressao(steps[steps.length-1].after)} pelo motivo: ${steps[steps.length-1].explanation}`)
+} 
+
+   
   return expr;
 }
+
+
+   
+
+
+
+// rewrite(expr, rules) {
+
+//   // 1️⃣ tenta aplicar regra no nó atual
+//   for (let rule of rules) {
+//     const bindings = this.match(rule.pattern, expr);
+//     if (bindings) {
+//       const replaced = this.substitute(rule.result, bindings);
+//       // reaplica rewrite para pegar novas oportunidades
+//      console.log("Simplificando a expressão " + this.impressao(expr) + " para " + this.impressao(replaced));
+//      return this.rewrite(replaced, rules);
+//     }
+//   }
+
+//   // 2️⃣ se nenhuma regra casou, tenta nos filhos
+//   if (expr.args) {
+//     return {
+//       ...expr,
+//       args: expr.args.map(arg => this.rewrite(arg, rules))
+//     };
+//   }
+
+//   if (expr.left) {
+//     return {
+//       ...expr,
+//       left: this.rewrite(expr.left, rules),
+//       right: this.rewrite(expr.right, rules)
+//     };
+//   }
+
+//   return expr;
+// }
 
     impressao(expr) {
         switch(expr.type) {
@@ -580,7 +631,7 @@ function P(name) {
 
 
 
-expression = "34 + 100 + 2 + 10 + 4 + 3 * 2 * 100 * 23 * 12 * 3 * 1.3 * 1.1 + 0 + 0.1"; 
+expression ="1*3*2*4*5*6*7+(2/3)/(2/3)+4+5+6+7+8+9+10-1-2-3-4-5-6-7-8-9-10"; 
 console.log("Expressão original: " + expression);
 
 const rules = [
@@ -590,7 +641,8 @@ const rules = [
       left: P("a"),
       right: P("a")
     },
-    result: { type: "Number", value: 1 }
+    result: { type: "Number", value: 1 },
+    explain: b => `Dividindo um valor por ele mesmo o resultado é sempre um, ou seja, ${calc.impressao(b.a)} / ${calc.impressao(b.a)} é igual a 1`
   },
   {
     pattern: {
@@ -633,7 +685,8 @@ const rules = [
             left: P("a"),
             right: P("a")
         },
-        result: { type: "Number", value: 0 }    
+        result: { type: "Number", value: 0 },
+        explain: b => `Subtraindo um valor por ele mesmo o resultado é sempre zero, ou seja, ${this.impressao(b.a.value || b.a.name )} - ${this.impressao(b.a.value || b.a.name )} é igual a zero`    
     },
     {
         pattern:{
@@ -641,7 +694,8 @@ const rules = [
             left: P("a"),
             right: { type: "Number", value: 0 }
         },
-        result: P("a")
+        result: P("a"),
+        explain: b => ` Subtraindo zero de qualquer valor o resultado continua sendo o mesmo, ou seja, ${this.impressao(b.a.value || b.a.name )} - 0 é igual a ${this.impressao(b.a.value || b.a.name)}`
     },
     { pattern: {
         type: "Mul",
@@ -649,7 +703,38 @@ const rules = [
     },
     result: { type: "Sub", left: { type: "Mul", args: [P("a"), P("b")] }, right: { type: "Mul", args: [P("a"), P("c")] } 
     }
-   }
+   },
+    {
+    pattern: { type:"Add", args:[P("a"), P("b")] },
+
+    condition: b =>
+      b.a.type === "Number" &&
+      b.b.type === "Number",
+
+    result: b => ({
+      type:"Number",
+      value: b.a.value + b.b.value
+    }),
+
+    explain: b =>
+      `Somando ${b.a.value} e ${b.b.value}`
+  },
+
+  {
+    pattern: { type:"Mul", args:[P("a"), P("b")] },
+
+    condition: b =>
+      b.a.type === "Number" &&
+      b.b.type === "Number",
+
+    result: b => ({
+      type:"Number",
+      value: b.a.value * b.b.value
+    }),
+
+    explain: b =>
+      `Multiplicando ${b.a.value} e ${b.b.value}`
+  }
     
 ];
 
@@ -659,15 +744,18 @@ console.log(calc);
 
 
 expression = JSON.parse(calc.parseEquals());
+console.log("Expressão após o parsing: " + JSON.stringify(expression));
 expression = calc.toNary(expression);
 expression = calc.normalize(expression);
 console.log("Expressão após a conversão para árvore n-ária: " + JSON.stringify(expression));
 expression = calc.canonicalize(expression);
 // expression = calc.simplifyConstants(expression);
 expression = calc.rewrite(expression, rules);
+console.log("tipo da expressão " + typeof expression);
 console.log("Expressão final: " + calc.impressao(expression));
+console.log("Expressão final em json", expression);
 
-// console.log(super_expressao.expressao);
+// console.log(su   per_expressao.expressao);
 
 let prioridades = {
     para: 0,
