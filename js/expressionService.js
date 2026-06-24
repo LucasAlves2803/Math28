@@ -228,6 +228,7 @@ class FormaFuncional{
 
 // Essa função ordena expressões de soma e multiplicação, ou seja, 4 + 1 + 2, se torna, 1 + 2 + 4, ordenou de forma crescente, e o mesmo vale caso fosse multiplicação, 4 * 1 * 2, vira 
 // 1 * 2 * 4, isso permite que árvores que tem os mesmos termos, mas em ordens diferentes, sejam consideradas iguais, ou seja, 4 + 1 + 2 e 1 + 2 + 4, são consideradas a mesma expressão, isso é importante para a função de simplificação de expressões, porque a função de simplificação de expressões precisa lidar com expressões do tipo 2 + 3 + 4 e 4 + 3 + 2, e essas expressões precisam ser consideradas iguais para que a função de simplificação de expressões funcione corretamente 
+// 18/06/2026 tarefa: melhorar o algoritmo para que a ordenação aconteça apenas quando dentro do args da soma e multiplicação, tenha apenas o tipo de operação desse args, ou seja, dentro do args da soma, só pode ter soma e dentro do args da multiplicação tenha apenas multiplicação
 canonicalize(expr) {
 
   switch(expr.type) {
@@ -236,22 +237,21 @@ canonicalize(expr) {
     case "Mul":
 
       let args = expr.args.map(a => this.canonicalize(a));
-      args.sort((a,b) => this.compareExpr(a,b));
-      
-      
-      if (JSON.stringify(expression).length !== JSON.stringify(expr).length && !this.compareArrays(expr.args, args)){
-        // esse trecho mostra a mensagem de ordenação da expressão, nesse 'if' verifica se a primeira expressão (variável "expression") e a parte que foi ordenada (variável "expr") tem tamanhos diferentes (se sim, significa que foi ordenado um trecho da expressão original, não a expressão inteira) e depois verifica se esse trecho da expressão já passada pela ordenada é diferente do trecho anterior a ordenação (se sim significa que houve mudanças logo faz sentido imprimir uma mensagem de explicação, senão significa que o trecho não mudou em nada mesmo depois da ordenação (o que acontece quando a 'expr' ja está naturalmente ordenada), logo não faz sentido imprimir uma mensagem de explicação)
+      if (this.apenasNumber(args)){
+        args.sort((a,b) => this.compareExpr(a,b));
+        if (JSON.stringify(expression).length !== JSON.stringify(expr).length && !this.compareArrays(expr.args, args)){
+            // esse trecho mostra a mensagem de ordenação da expressão, nesse 'if' verifica se a primeira expressão (variável "expression") e a parte que foi ordenada (variável "expr") tem tamanhos diferentes (se sim, significa que foi ordenado um trecho da expressão original, não a expressão inteira) e depois verifica se esse trecho da expressão já passada pela ordenada é diferente do trecho anterior a ordenação (se sim significa que houve mudanças logo faz sentido imprimir uma mensagem de explicação, senão significa que o trecho não mudou em nada mesmo depois da ordenação (o que acontece quando a 'expr' ja está naturalmente ordenada), logo não faz sentido imprimir uma mensagem de explicação)
             console.log("Expressão "+ this.impressao(expression) + "no trecho " +   this.impressao(expr)  + "ordenada para " +   this.impressao({ type: expr.type, args }));
             expression = JSON.stringify(expression).replace(JSON.stringify(expr), JSON.stringify({ type: expr.type, args }));
             expression = JSON.parse(expression);
-      }else if (JSON.stringify(expression).length === JSON.stringify(expr).length && this.compareArrays(expr.args, args)){
+        }else if (JSON.stringify(expression).length === JSON.stringify(expr).length && this.compareArrays(expr.args, args)){
             // esse 'if' primeiro verifica se a expressão original (variável "expression") e a expressão que foi ordenada (variável "expr") tem o mesmo tamanho (se sim, significa que a expressão inteira foi ordenada, (outro detalhe, ter o mesmo tamanho não significa que as expressões são exatamente iguais, a expressão original pode já está ordenada em outras partes, por ter passado pelo 'if' acima antes desse por causa da recursão, enquanto que a expressão (expr) está 'desatualizada')) e depois verifica se a expressão ( compareArrays(expr.args, args)) antes e depois da ordenação são diferentes (se sim, teve ordenação real, por isso é importante fazer uma explicação)
             console.log("Expressão "+ this.impressao(expression) +  "ordenada para " +   this.impressao({ type: expr.type, args }));
             expression = JSON.stringify(expression).replace(JSON.stringify(expr), JSON.stringify({ type: expr.type, args }));
             expression = JSON.parse(expression);
-      }
-
-        
+        }
+      }  
+      
       return { type: expr.type, 
             args 
       };
@@ -275,6 +275,15 @@ canonicalize(expr) {
   }
 }
 
+apenasNumber(a){ // essa função permite a ordenação apenas se TODOS os elementos dentro do args seja do tipo Numbers
+    for( let elem of a){
+        if (elem.type !== "Number"){
+            return false;
+        }
+    }
+    return true;
+}
+
 compareArrays = (a, b) => {
   if (a.length !== b.length) return false;
   else {
@@ -287,6 +296,8 @@ compareArrays = (a, b) => {
     return true;
   }
 };
+
+
 
 
 compareExpr(a,b) {
@@ -543,7 +554,7 @@ rewrite(expr, rules, steps = []) {
 
   if (expr.left){
     return {
-        expr,
+        type: expr.type === 'Div' ? "Div" : "Sub",
         left: this.rewrite(expr.left, rules, steps),
         right: this.rewrite(expr.right, rules, steps)
     }
@@ -551,11 +562,14 @@ rewrite(expr, rules, steps = []) {
 
 //   steps.map(step => {console.log("Aplicando regra: " + step.explanation + "\n antes era " + step.before + " agora é " + step.after)});   
 if (steps.length > 0){
-     console.log(`A expressão mudou de ${this.impressao(steps[steps.length-1].before)} para ${this.impressao(steps[steps.length-1].after)} pelo motivo: ${steps[steps.length-1].explanation}`)
+    console.log(`A expressão mudou de ${this.impressao(steps[steps.length-1].before)} para ${this.impressao(steps[steps.length-1].after)} pelo motivo: ${steps[steps.length-1].explanation}`)
+    const resultado_atual = steps[steps.length-1].after;
+    steps.pop();
+    return resultado_atual;
 } 
 
-   
-  return expr;
+   return expr;
+  
 }
 
 
@@ -631,54 +645,51 @@ function P(name) {
 
 
 
-expression ="1*3*2*4*5*6*7+(2/3)/(2/3)+4+5+6+7+8+9+10-1-2-3-4-5-6-7-8-9-10"; 
+expression ="(2*(3+2))"; 
 console.log("Expressão original: " + expression);
 
 const rules = [
-    {
-    pattern: {
-      type: "Div",
-      left: P("a"),
-      right: P("a")
-    },
-    result: { type: "Number", value: 1 },
-    explain: b => `Dividindo um valor por ele mesmo o resultado é sempre um, ou seja, ${calc.impressao(b.a)} / ${calc.impressao(b.a)} é igual a 1`
-  },
+  
   {
     pattern: {
         type: "Mul",
         args: [P("a"), { type: "Number", value: 0 }]
     },
-    result: { type: "Number", value: 0 }
+    result: { type: "Number", value: 0 },
+    explain: b => `Multiplicar qualquer número por 0 resulta em 0, ou seja, ${(b.a.value)} * 0 = 0`
   },
   {
     pattern: {
         type: "Mul",
         args: [P("a"), { type: "Number", value: 1 }]
     },
-    result: P("a")
-    },
+    result: P("a"),
+    explain: b => `Multiplicar qualquer número por 1 não altera o valor do número, ou seja, ${(b.a.value)} * 1 = ${(b.a.value)}`
+    
+ },
   {
         pattern: {
             type: "Add",
-            args: [P("a"), { type: "Number", value: 0 }]
+            args: [{ type: "Number", value: 0 },P("a") ]
         },
-        result: P("a")
+        result: P("a"),
+        explain: b => `Somar 0 a qualquer número não altera nada, ou seja, ${(b.a.value)} - 0 = ${(b.a.value)} `
   },
-//   {
-//     pattern: {
-//         type: "Mul",
-//         args: [P("a"), { type: "Add", args: [P("b"), P("c")] }]
-//     },
-//     result: { type: "Add", args: [{ type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] }] }
-//   },
-    {
-        pattern: {
-            type: "Add",
-            args: [ { type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] } ]
-        },
-        result: { type: "Mul", args: [P("a"), { type: "Add", args: [P("b"), P("c")] }] }
+  {
+    pattern: {
+        type: "Mul",
+        args: [P("a"), { type: "Add", args: [P("b"), P("c")] }]
     },
+    result: { type: "Add", args: [{ type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] }] },
+    explain: b => `Aplicação da propriedade distributiva ${(b.a.value)} * (${(b.b.value)} + ${(b.c.value)})  = (${(b.a.value)} * ${(b.b.value)}) + (${(b.a.value)} * ${(b.c.value)})`
+  },
+    // {
+    //     pattern: {
+    //         type: "Add",
+    //         args: [ { type: "Mul", args: [P("a"), P("b")] }, { type: "Mul", args: [P("a"), P("c")] } ]
+    //     },
+    //     result: { type: "Mul", args: [P("a"), { type: "Add", args: [P("b"), P("c")] }] }
+    // },
     {
         pattern:{
             type: "Sub",
@@ -686,7 +697,7 @@ const rules = [
             right: P("a")
         },
         result: { type: "Number", value: 0 },
-        explain: b => `Subtraindo um valor por ele mesmo o resultado é sempre zero, ou seja, ${this.impressao(b.a.value || b.a.name )} - ${this.impressao(b.a.value || b.a.name )} é igual a zero`    
+        explain: b => `Subtraindo um valor por ele mesmo o resultado é sempre zero, ou seja, ${(b.a.value || b.a.name )} - ${(b.a.value || b.a.name )} é igual a zero`    
     },
     {
         pattern:{
@@ -695,7 +706,7 @@ const rules = [
             right: { type: "Number", value: 0 }
         },
         result: P("a"),
-        explain: b => ` Subtraindo zero de qualquer valor o resultado continua sendo o mesmo, ou seja, ${this.impressao(b.a.value || b.a.name )} - 0 é igual a ${this.impressao(b.a.value || b.a.name)}`
+        explain: b => ` Subtraindo zero de qualquer valor o resultado continua sendo o mesmo, ou seja, ${(b.a.value || b.a.name )} - 0 é igual a ${(b.a.value || b.a.name)}`
     },
     { pattern: {
         type: "Mul",
@@ -716,8 +727,7 @@ const rules = [
       value: b.a.value + b.b.value
     }),
 
-    explain: b =>
-      `Somando ${b.a.value} e ${b.b.value}`
+    explain: b => `Somando ${b.a.value} e ${b.b.value}`
   },
 
   {
@@ -732,9 +742,17 @@ const rules = [
       value: b.a.value * b.b.value
     }),
 
-    explain: b =>
-      `Multiplicando ${b.a.value} e ${b.b.value}`
-  }
+    explain: b => `Multiplicando ${b.a.value} e ${b.b.value}`
+  },
+    {
+    pattern: {
+      type: "Div",
+      left: P("a"),
+      right: P("a")
+    },
+    result: { type: "Number", value: 1 },
+    explain: b => `Dividindo um valor por ele mesmo o resultado é sempre um, ou seja, ${calc.impressao(b.a)} / ${calc.impressao(b.a)} é igual a 1`
+  },
     
 ];
 
@@ -751,9 +769,11 @@ console.log("Expressão após a conversão para árvore n-ária: " + JSON.string
 expression = calc.canonicalize(expression);
 // expression = calc.simplifyConstants(expression);
 expression = calc.rewrite(expression, rules);
+
+console.log("Expressão final em json", JSON.stringify(expression));
 console.log("tipo da expressão " + typeof expression);
 console.log("Expressão final: " + calc.impressao(expression));
-console.log("Expressão final em json", expression);
+
 
 // console.log(su   per_expressao.expressao);
 
