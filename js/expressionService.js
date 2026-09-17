@@ -612,12 +612,13 @@ if (steps.length > 0){
     impressao(expr) {
         switch(expr.type) {
             case "Number":
-            case "Var":
                 if (expr.value != 0){
-                    return expr.value || expr.name;
+                    return expr.value ;
                 }else{
                     return 0;
-                }  
+                }
+            case "Var":
+                return expr.name;  
             case "Add":
             case "Mul":
                 return " (" + expr.args.map(arg => this.impressao(arg)).join(expr.type === "Add" ? " + " : " * ") + ")";
@@ -645,7 +646,7 @@ function P(name) {
 
 
 
-expression ="(2*(3+2))"; 
+expression ="(x+x)"; 
 console.log("Expressão original: " + expression);
 
 const rules = [
@@ -673,7 +674,7 @@ const rules = [
             args: [{ type: "Number", value: 0 },P("a") ]
         },
         result: P("a"),
-        explain: b => `Somar 0 a qualquer número não altera nada, ou seja, ${(b.a.value)} - 0 = ${(b.a.value)} `
+        explain: b => `Somar 0 a qualquer número não altera nada, ou seja, ${(b.a.value)} + 0 = ${(b.a.value)} `
   },
   {
     pattern: {
@@ -715,35 +716,45 @@ const rules = [
     result: { type: "Sub", left: { type: "Mul", args: [P("a"), P("b")] }, right: { type: "Mul", args: [P("a"), P("c")] } 
     }
    },
-    {
-    pattern: { type:"Add", args:[P("a"), P("b")] },
+//     {
+//     pattern: { type:"Add", args:[P("a"), P("b")] },
 
-    condition: b =>
-      b.a.type === "Number" &&
-      b.b.type === "Number",
+//     condition: b =>
+//       b.a.type === "Number" &&
+//       b.b.type === "Number",
+
+//     result: b => ({
+//       type:"Number",
+//       value: b.a.value + b.b.value
+//     }),
+
+//     explain: b => `Somando ${b.a.value} e ${b.b.value}`
+//   },
+
+//   {
+//     pattern: { type:"Mul", args:[P("a"), P("b")] },
+
+//     condition: b =>
+//       b.a.type === "Number" &&
+//       b.b.type === "Number",
+
+//     result: b => ({
+//       type:"Number",
+//       value: b.a.value * b.b.value
+//     }),
+
+//     explain: b => `Multiplicando ${b.a.value} e ${b.b.value}`
+//   },
+  { pattern: { type:"Add", args: [ P("a"), P("a")] },
+    
+    condition: b => b.a.type === "Var",
 
     result: b => ({
-      type:"Number",
-      value: b.a.value + b.b.value
+        type: "Mul",
+        args: [calc.substitute(P("a"),b),{type: "Number", value: 2}]
     }),
-
-    explain: b => `Somando ${b.a.value} e ${b.b.value}`
-  },
-
-  {
-    pattern: { type:"Mul", args:[P("a"), P("b")] },
-
-    condition: b =>
-      b.a.type === "Number" &&
-      b.b.type === "Number",
-
-    result: b => ({
-      type:"Number",
-      value: b.a.value * b.b.value
-    }),
-
-    explain: b => `Multiplicando ${b.a.value} e ${b.b.value}`
-  },
+    explain: b => `Somando ${b.a.name} + ${b.a.name} = 2 * ${b.a.name}`
+ },
     {
     pattern: {
       type: "Div",
@@ -769,10 +780,10 @@ console.log("Expressão após a conversão para árvore n-ária: " + JSON.string
 expression = calc.canonicalize(expression);
 // expression = calc.simplifyConstants(expression);
 expression = calc.rewrite(expression, rules);
-
+console.log("Expressão final: " + calc.impressao(expression));
 console.log("Expressão final em json", JSON.stringify(expression));
 console.log("tipo da expressão " + typeof expression);
-console.log("Expressão final: " + calc.impressao(expression));
+
 
 
 // console.log(su   per_expressao.expressao);
